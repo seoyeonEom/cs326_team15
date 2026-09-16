@@ -6,6 +6,7 @@
 | :---------------- | :-------------- |
 | Seoyeon Eom       | @seoyeonEom     |
 | Agustin Pemberton | @ampemb         |
+| Sally Vakhtangishvili | @salikuna |
 
 ## Working Agreement
 
