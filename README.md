@@ -2,17 +2,20 @@
 
 ## Team Member
 
-| Name              | GitHub Username |
-| :---------------- | :-------------- |
-| Seoyeon Eom       | @seoyeonEom     |
-| Agustin Pemberton | @ampemb         |
-| Sally Vakhtangishvili | @salikuna |
+| Name                  | GitHub Username                              |
+| :-------------------- | :------------------------------------------- |
+| Seoyeon Eom           | [@seoyeonEom](https://github.com/seoyeonEom) |
+| Agustin Pemberton     | [@ampemb](https://github.com/ampemb)         |
+| Sally Vakhtangishvili | [@Salikuna](https://github.com/Salikuna)     |
 
 ## Working Agreement
 
-- Meeting Schedule
--
+- **Communication Cadence:** Primary communication will occur on WhatsApp, with team members agreeing to respond on the same day (within 12 hours) on weekdays and within 2 hours on sprint milestone due dates.
+- **Meeting Schedule:** We will hold a weekly sync meeting (virtual or in-person) to review sprint progress, allocate tasks, and resolve blockers.
+- **Definition of "Done" for PRs:** All work must be done on separate feature branches. A PR is considered done only after resolving conflicts and receiving at least 1 approving peer review before merging to `main`.
+
+* **Decision Making & Conflict Resolution:** Technical or design disagreements will be discussed during sync meetings by evaluating pros, cons, and project scope. If consensus cannot be reached, the decision will be made by a team majority vote.
 
 ## Project Domain
-This project is in the domain of Environmental Sustainability. We build a energy usage and carbon emission tracker which allows users to input their daily usage data for perspective and allows them to gain awareness of their personal impact on the environment. Communites benefit when their individuals have insight into their personal energy usage and Carbon emissions in the context of the environment over time.
 
+Our project is a gamified carbon footprint tracker that helps university students monitor and reduce their daily environmental impact. Using open APIs to track carbon intensity over time, the application provides interactive daily tracking and visual impact graphs. By turning emissions data into actionable goals, the platform fosters sustainable campus habits and active climate awareness beyond the classroom.
