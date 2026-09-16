@@ -17,3 +17,5 @@
 * **Decision Making & Conflict Resolution:** Technical or design disagreements will be discussed during sync meetings by evaluating pros, cons, and project scope. If consensus cannot be reached, the decision will be made by a team majority vote.
 
 ## Project Domain
+
+Our project is a gamified carbon footprint tracker that helps university students monitor and reduce their daily environmental impact. Using open APIs to track carbon intensity over time, the application provides interactive daily tracking and visual impact graphs. By turning emissions data into actionable goals, the platform fosters sustainable campus habits and active climate awareness beyond the classroom.
