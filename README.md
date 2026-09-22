@@ -25,6 +25,11 @@ Our project is a gamified carbon footprint tracker that helps university student
 
 Follow these steps to run the application locally.
 
+**Prerequisites**
+
+Make sure you have **Node.js** and **npm** installed on your system.
+If you don't have Node.js installed, download and install the LTS version from [nodejs.org](https://nodejs.org/).
+
 1. Clone the repository
 
    ```bash
