@@ -7,6 +7,7 @@
 | Seoyeon Eom           | [@seoyeonEom](https://github.com/seoyeonEom) |
 | Agustin Pemberton     | [@ampemb](https://github.com/ampemb)         |
 | Sally Vakhtangishvili | [@Salikuna](https://github.com/Salikuna)     |
+| Willow Taylor         |                                              |
 
 ## Working Agreement
 
@@ -19,3 +20,30 @@
 ## Project Domain
 
 Our project is a gamified carbon footprint tracker that helps university students monitor and reduce their daily environmental impact. Using open APIs to track carbon intensity over time, the application provides interactive daily tracking and visual impact graphs. By turning emissions data into actionable goals, the platform fosters sustainable campus habits and active climate awareness beyond the classroom.
+
+## Getting Started
+
+Follow these steps to run the application locally.
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/seoyeonEom/cs326_team15.git
+   cd cs326_team15
+   ```
+
+2. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+3. Start the Express server
+
+   ```bash
+   npm start
+   ```
+
+4. Access the application
+   - **Home page:** [http://localhost:3000](http://localhost:3000)
+   - **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
