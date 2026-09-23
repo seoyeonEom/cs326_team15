@@ -7,7 +7,7 @@
 | Seoyeon Eom           | [@seoyeonEom](https://github.com/seoyeonEom) |
 | Agustin Pemberton     | [@ampemb](https://github.com/ampemb)         |
 | Sally Vakhtangishvili | [@Salikuna](https://github.com/Salikuna)     |
-| Willow Taylor         |                                              |
+| Willow Taylor         | [@RaineWillow](https://github.com/RaineWillow) |
 
 ## Working Agreement
 
