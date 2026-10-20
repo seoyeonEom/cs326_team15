@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <main>
+      <h2>Transportation Activity Logging</h2>
+      <form id="activity-form">
+        <label>Date <input type="date" name="date" required></label>
+        <label>Transportation method
+          <select name="method" required>
+            <option value="">Select a method</option>
+            <option value="walking">Walking</option>
+            <option value="cycling">Cycling</option>
+            <option value="bus">Bus</option>
+            <option value="car">Car</option>
+          </select>
+        </label>
+        <label>Distance <input type="number" name="distance" min="0.001" step="any" required></label>
+        <label>Unit
+          <select name="unit" required>
+            <option value="km">km</option>
+            <option value="mi">mi</option>
+          </select>
+        </label>
+        <button type="submit">Save activity</button>
+      </form>
+
+
+
+      <p id="message" role="status" aria-live="polite"></p>
+      <h2>Saved Activities</h2>
+      <ul id="activities">
+        <% activities.forEach((activity)=>{%>
+          <li>
+            <strong><%= activity.date %></strong> — <%= activity.method %>, <%= activity.distance %> <%= activity.unit %> — <%= activity.emissions %> kg CO2
+          </li>
+        <% }); %>
+      </ul>
+
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -2,11 +2,11 @@
 
 ## Team Member
 
-| Name                  | GitHub Username                              |
-| :-------------------- | :------------------------------------------- |
-| Seoyeon Eom           | [@seoyeonEom](https://github.com/seoyeonEom) |
-| Agustin Pemberton     | [@ampemb](https://github.com/ampemb)         |
-| Sally Vakhtangishvili | [@Salikuna](https://github.com/Salikuna)     |
+| Name                  | GitHub Username                                |
+| :-------------------- | :--------------------------------------------- |
+| Seoyeon Eom           | [@seoyeonEom](https://github.com/seoyeonEom)   |
+| Agustin Pemberton     | [@ampemb](https://github.com/ampemb)           |
+| Sally Vakhtangishvili | [@Salikuna](https://github.com/Salikuna)       |
 | Willow Taylor         | [@RaineWillow](https://github.com/RaineWillow) |
 
 ## Working Agreement
@@ -25,10 +25,7 @@ Our project is a gamified carbon footprint tracker that helps university student
 
 Follow these steps to run the application locally.
 
-**Prerequisites**
-
-Make sure you have **Node.js** and **npm** installed on your system.
-If you don't have Node.js installed, download and install the LTS version from [nodejs.org](https://nodejs.org/).
+**Prerequisites:** **Node.js** and **npm**. If needed, install the LTS version from [nodejs.org](https://nodejs.org/).
 
 1. Clone the repository
 
@@ -43,7 +40,7 @@ If you don't have Node.js installed, download and install the LTS version from [
    npm install
    ```
 
-3. Start the Express server
+3. Start the Express server from the project root
 
    ```bash
    npm start
@@ -52,3 +49,74 @@ If you don't have Node.js installed, download and install the LTS version from [
 4. Access the application
    - **Home page:** [http://localhost:3000](http://localhost:3000)
    - **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
+   - **Transportation Activities:** [http://localhost:3000/activities](http://localhost:3000/activities)
+
+## Sprint 2 Features
+
+### 1. Transportation Activity Logging
+
+Students can record a transportation activity and see its estimated carbon emissions.
+
+**How to use:**
+
+1. Visit http://localhost:3000/activities.
+2. Choose a date and transportation method (`walking`, `cycling`, `bus`, or `car`).
+3. Enter a positive distance and select `km` or `mi`.
+4. Click **Save activity**.
+5. View the saved activity and emissions estimate in **Saved Activities**. Reload the page to see the saved records again.
+
+**Validation and persistence:** The service validates user input and calculates estimated emissions. Activities are saved in data/activities.json, and invalid requests return a 400 response with an error message.
+
+**Emissions calculation:** Estimated emissions are calculated based on transportation method and distance, using illustrative emission factors.
+
+### 2. Weekly Goal Setting
+
+Students can set a weekly transportation goal and track their progress based on saved activities.
+
+**How to use:**
+
+1. Visit /goals.
+2. Select a week, transportation method, and target number of days.
+3. Click Save Goal.
+4. View the saved goal and progress based on matching transportation activities.
+5. Reload the page to view the saved goal and updated progress.
+
+The service validates the input and prevents duplicate goals for the same week and transportation method. Goals are saved in data/goals.json. Multiple activities on the same day count as one day toward the goal.
+
+## System Diagram
+
+```mermaid
+
+flowchart TD
+    A["Browser (Frontend)"]
+
+    subgraph Activities["Feature 1: Transportation Logging"]
+        B["Activities Route"]
+        C["Activities Controller"]
+        D["Activities Service"]
+        E["Activities Repository"]
+        F[("activities.json")]
+
+        B --> C --> D --> E --> F
+    end
+
+    subgraph Goals["Feature 2: Weekly Goal Setting"]
+        G["Goals Route"]
+        H["Goals Controller"]
+        I["Goals Service"]
+        J["Goals Repository"]
+        K[("goals.json")]
+
+        G --> H --> I --> J --> K
+    end
+
+    A -->|"POST /activities"| B
+    A -->|"POST /goals"| G
+    I -.->|"Read activity records"| E
+    C -.->|"JSON response"| A
+    H -.->|"JSON response"| A
+```
+
+## Design Decisions
+
+**Seoyeon Eom**: For Transportation Activity Logging, I decided to keep input validation and carbon emission calculations in the service layer rather than the controller. An alternative would have been to handle these operations directly in the controller, which would have been simpler for a small application. However, separating the business logic from HTTP request handling makes the code easier to maintain and reuse. For example, if we add other ways to log activities in future sprints, we can reuse the same validation and calculation logic without duplicating it in different controllers. Although this approach requires more files and a slightly more complex structure, I think it is a better choice for our project's future development.
