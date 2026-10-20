@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/seoyeonEom/cs326_team15#readme",
   "dependencies": {
+    "ejs": "^7.0.2",
     "express": "^5.2.1"
   }
 }

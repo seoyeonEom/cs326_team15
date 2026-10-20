@@ -1,3 +1,7 @@
+# Sprint 0
+
+I used no AI at all.
+
 # Sprint 1
 
 I used no AI at all.
