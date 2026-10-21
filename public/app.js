@@ -54,9 +54,14 @@ if (form && list && message) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(activity),
       });
-      list.append(buildItem(saved));
-      message.textContent = "Activity saved successfully.";
       form.reset();
+      message.textContent = "Activity saved successfully.";
+      try {
+        await refreshBreakdown();
+      } catch (error) {
+        message.textContent =
+          `Activity saved, but the breakdown could not be refreshed: ${error.message}`;
+      }
     } catch (error) {
       message.textContent = `Your activity was not saved. ${error.message}`;
     } finally {
@@ -64,3 +69,38 @@ if (form && list && message) {
     }
   });
 }
+const methodFilter = document.querySelector("#method-filter");
+const totalEmissions = document.querySelector("#total-emissions");
+const activityCount = document.querySelector("#activity-count");
+
+const refreshBreakdown = async () => {
+  const method = methodFilter.value;
+  const query = method ? `?method=${encodeURIComponent(method)}` : "";
+
+  const breakdown = await fetchJSON(`/activities/breakdown${query}`);
+
+  totalEmissions.textContent = `${breakdown.totalEmissions} kg CO₂`;
+  activityCount.textContent = breakdown.activityCount;
+
+  list.replaceChildren();
+
+  breakdown.activities.forEach((activity) => {
+    list.append(buildItem(activity));
+  });
+};
+
+if (methodFilter && totalEmissions && activityCount && list && message) {
+  methodFilter.addEventListener("change", async () => {
+    try {
+      await refreshBreakdown();
+      message.textContent = "";
+    } catch (error) {
+      message.textContent = `Could not load breakdown. ${error.message}`;
+    }
+  });
+
+  refreshBreakdown().catch((error) => {
+    message.textContent = `Could not load breakdown. ${error.message}`;
+  });
+}
+
