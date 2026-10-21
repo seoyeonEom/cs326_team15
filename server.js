@@ -1,5 +1,6 @@
 import express from "express";
 import activitiesRouter from "./routes/activities.js";
+import goalsRouter from "./routes/goals.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.get("/dashboard", (req, res) => {
 });
 
 app.use("/activities", activitiesRouter);
+app.use("/goals", goalsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Page not found." });

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+<%- include('partials/header') %>
+    <main>
+      <h2>Set a Weekly Goal</h2>
+      <form id="goal-form">
+        <label>Week of (any day in the week)
+          <input type="date" name="week" required>
+        </label>
+        <label>Transportation method
+          <select name="method" required>
+            <option value="">Select a method</option>
+            <option value="walking">Walking</option>
+            <option value="cycling">Cycling</option>
+            <option value="bus">Bus</option>
+            <option value="car">Car</option>
+          </select>
+        </label>
+        <label>Target days
+          <input type="number" name="targetDays" min="1" max="7" step="1" required>
+        </label>
+        <button type="submit">Save goal</button>
+      </form>
+      <p class="note">
+        Weeks run Monday to Sunday. Progress counts each day with a matching activity, which you should be sure to update once a day.
+      </p>
+
+      <p id="message" role="status" aria-live="polite"></p>
+      <h2>Your Goals</h2>
+      <ul id="goals">
+<% goals.forEach((goal) => { %>
+        <li class="<%= goal.achieved ? 'achieved' : '' %>">
+          <strong><%= goal.weekStart %> to <%= goal.weekEnd %></strong> — <%= goal.method %> — <%= goal.completedDays %>/<%= goal.targetDays %> days<%= goal.achieved ? ' — goal met' : '' %>
+        </li>
+<% }); %>
+      </ul>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
