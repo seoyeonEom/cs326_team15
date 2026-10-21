@@ -33,6 +33,27 @@
 
 
       <p id="message" role="status" aria-live="polite"></p>
+      <section id="emissions-breakdown">
+        <h2>Transportation Emissions Breakdown </h2>
+
+        <label for="method-filter">Filter by Transportation method:</label>
+        <select id="method-filter">
+          <option value="">All transportation</option>
+          <option value="walking">Walking</option>
+          <option value="cycling">Cycling</option>
+          <option value="bus">Bus</option>
+          <option value="car">Car</option>
+        </select>
+
+        <p>Total CO2 Emissions:
+          <strong id="total-emissions">Loading...</strong>
+        </p>
+
+        <p>Number of activities:
+          <strong id="activity-count">Loading...</strong>
+        </p>
+      </section>
+      
       <h2>Saved Activities</h2>
       <ul id="activities">
         <% activities.forEach((activity)=>{%>

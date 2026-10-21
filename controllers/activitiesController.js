@@ -21,3 +21,13 @@ export const create = async (req, res) => {
   }
   res.status(201).json(result.value);
 };
+
+export const breakdown = async (req, res) => {
+  const { method } = req.query;
+  const result = await activitiesService.getEmissionsBreakdown(method);
+  if (!result.ok) {
+    res.status(result.error.status).json({ error: result.error.message });
+    return;
+  }
+  res.status(200).json(result.value);
+};

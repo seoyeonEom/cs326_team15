@@ -79,10 +79,42 @@ const validateActivity = (data) => {
   return Ok({ date, method, distance: Number(distance), unit });
 };
 
-export const listActivities = async () => {
+
+export const listActivities = async (method) => {
   const activities = await getAll();
-  return activities.map(toActivityDto);
+
+  const filteredActivities = method
+    ? activities.filter((activity) => activity.method === method)
+    : activities;
+
+  return filteredActivities.map(toActivityDto);
 };
+
+export const getEmissionsBreakdown = async (method) => {
+  const validMethods = ["walking", "cycling", "bus", "car"];
+
+  if (method !== undefined && !validMethods.includes(method)) {
+    return Err({
+      status: 400,
+      message: "Invalid transportation method."
+    });
+  }
+
+  const activities = await listActivities(method);
+  
+  const totalEmissions = activities.reduce(
+    (total, activity) => total + activity.emissions,
+    0
+  );
+
+  return Ok({
+    activities,
+    totalEmissions: Number(totalEmissions.toFixed(3)),
+    activityCount: activities.length
+  });
+};
+
+
 
 export const createActivity = async (data) => {
   const result = validateActivity(data);

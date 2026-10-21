@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/", asyncHandler(activitiesController.index));
 router.get("/data", asyncHandler(activitiesController.list));
+router.get("/breakdown", asyncHandler(activitiesController.breakdown));
 router.post("/", asyncHandler(activitiesController.create));
 
 export default router;
