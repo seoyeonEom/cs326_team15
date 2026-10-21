@@ -50,6 +50,7 @@ Follow these steps to run the application locally.
    - **Home page:** [http://localhost:3000](http://localhost:3000)
    - **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
    - **Transportation Activities:** [http://localhost:3000/activities](http://localhost:3000/activities)
+   - **Weekly Goals:** [http://localhost:3000/goals](http://localhost:3000/goals)
 
 ## Sprint 2 Features
 
@@ -69,73 +70,45 @@ Students can record a transportation activity and see its estimated carbon emiss
 
 **Emissions calculation:** Estimated emissions are calculated based on transportation method and distance, using illustrative emission factors.
 
-### 2. Weekly Goal Setting
+### 2. Transportation Emissions Breakdown
 
-Students can set a weekly transportation goal and track their progress based on saved activities.
+Students can filter their transportation activities by method and view a summary of their estimated carbon emissions.
 
 **How to use:**
 
-1. Visit /goals.
-2. Select a week, transportation method, and target number of days.
-3. Click Save Goal.
-4. View the saved goal and progress based on matching transportation activities.
-5. Reload the page to view the saved goal and updated progress.
+1. Visit [http://localhost:3000/activities](http://localhost:3000/activities).
+2. Select a transportation method (`walking`, `cycling`, `bus`, or `car`) from the filter, or choose `All` to view every activity.
+3. View the filtered activities in **Saved Activities**.
+4. Check the total estimated emissions and activity count for the selected method.
+5. Add a new activity to see the breakdown update.
 
-The service validates the input and prevents duplicate goals for the same week and transportation method. Goals are saved in data/goals.json. Multiple activities on the same day count as one day toward the goal.
+**Filtering and aggregation:** The service retrieves saved activities from `data/activities.json` and filters them by transportation method. It calculates the total estimated emissions and activity count for the selected records.
+
+**Data persistence:** This feature uses existing transportation activity records and does not require a separate data file.
+
+### 3. Weekly Goal Setting
+
+Students can set weekly transportation goals and track their progress based on recorded activities.
+
+**How to use:**
+
+1. Visit [http://localhost:3000/goals](http://localhost:3000/goals).
+2. Choose a date within the target week.
+3. Select a transportation method (`walking`, `cycling`, `bus`, or `car`).
+4. Enter a target number of days between 1 and 7.
+5. Click **Save goal**.
+6. View the saved goal, completed days, and achievement status. Reload the page to see updated progress based on saved activities.
+
+**Validation and persistence:** The service validates user input and prevents duplicate goals for the same week and transportation method. Goals are saved in `data/goals.json`. Invalid requests return a 400 response, and duplicate goals return a 409 response.
+
+**Progress calculation:** The service reads transportation activities from `data/activities.json` and counts the number of unique days with matching activities during the selected Monday–Sunday week. Multiple activities on the same day count as one completed day. A goal is marked as achieved when completed days meet or exceed the target.
 
 ## System Diagram
 
-```mermaid
+The diagram below illustrates the architecture of the
+three Sprint 2 features and their shared data flow.
 
-flowchart TD
-    A["Browser (Frontend)"]
-
-    subgraph Activities["Feature 1: Transportation Logging"]
-        B["Activities Route"]
-        C["Activities Controller"]
-        D["Activities Service"]
-        E["Activities Repository"]
-        F[("activities.json")]
-
-        B --> C --> D --> E --> F
-    end
-
-    subgraph Goals["Feature 2: Weekly Goal Setting"]
-        G["Goals Route"]
-        H["Goals Controller"]
-        I["Goals Service"]
-        J["Goals Repository"]
-        K[("goals.json")]
-
-        G --> H --> I --> J --> K
-    end
-
-    A -->|"POST /activities"| B
-    A -->|"POST /goals"| G
-    I -.->|"Read activity records"| E
-    C -.->|"JSON response"| A
-    H -.->|"JSON response"| A
-```
-
-### 3. Transportation Emissions Breakdown
-
-Students can filter their saved transportation activities by method
-(walking, cycling, bus, or car) and view the total estimated CO2
-emissions and number of activities for the selected method.
-
-**How to use:**
-1. Visit http://localhost:3000/activities.
-2. Scroll to Transportation Emissions Breakdown.
-3. Select a transportation method or choose All Transportation.
-4. View the updated total emissions, activity count, and filtered
-   activity records.
-
-**Implementation:**
-- GET /activities/breakdown returns the emissions summary.
-- An optional method query parameter filters the activities.
-- The service validates the method and calculates total emissions.
-- Invalid methods receive a 400 response.
-- The frontend updates the breakdown without reloading the page.
+![Sprint 2 System Architecture](docs/diagram.svg)
 
 ## Design Decisions
 
