@@ -117,6 +117,28 @@ flowchart TD
     H -.->|"JSON response"| A
 ```
 
+### 3. Transportation Emissions Breakdown
+
+Students can filter their saved transportation activities by method
+(walking, cycling, bus, or car) and view the total estimated CO2
+emissions and number of activities for the selected method.
+
+**How to use:**
+1. Visit http://localhost:3000/activities.
+2. Scroll to Transportation Emissions Breakdown.
+3. Select a transportation method or choose All Transportation.
+4. View the updated total emissions, activity count, and filtered
+   activity records.
+
+**Implementation:**
+- GET /activities/breakdown returns the emissions summary.
+- An optional method query parameter filters the activities.
+- The service validates the method and calculates total emissions.
+- Invalid methods receive a 400 response.
+- The frontend updates the breakdown without reloading the page.
+
 ## Design Decisions
 
 **Seoyeon Eom**: For Transportation Activity Logging, I decided to keep input validation and carbon emission calculations in the service layer rather than the controller. An alternative would have been to handle these operations directly in the controller, which would have been simpler for a small application. However, separating the business logic from HTTP request handling makes the code easier to maintain and reuse. For example, if we add other ways to log activities in future sprints, we can reuse the same validation and calculation logic without duplicating it in different controllers. Although this approach requires more files and a slightly more complex structure, I think it is a better choice for our project's future development.
+
+**Sally Vakhtangishvili:** For the Transportation Emissions Breakdown feature, I chose to implement filtering and emissions aggregation in the service layer rather than calculating these values directly in the frontend. An alternative would have been to retrieve all activities and use browser-side JavaScript to filter and sum their emissions. While that approach would have avoided creating a new API endpoint, keeping the calculations in the service layer ensures that the same business logic can be reused by other parts of the application, including the dashboard. It also allows the backend to validate the transportation method consistently and return a clear error for invalid requests. This introduces an additional endpoint but makes the functionality easier to maintain and extend.
