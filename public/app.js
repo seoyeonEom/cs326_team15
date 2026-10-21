@@ -69,6 +69,47 @@ if (form && list && message) {
     }
   });
 }
+
+const goalForm = document.querySelector("#goal-form");
+const goalList = document.querySelector("#goals");
+
+const buildGoalItem = (goal) => {
+  const item = document.createElement("li");
+  if (goal.achieved) item.classList.add("achieved");
+  const week = document.createElement("strong");
+  week.textContent = `${goal.weekStart} to ${goal.weekEnd}`;
+  item.append(
+    week,
+    ` — ${goal.method} — ${goal.completedDays}/${goal.targetDays} days` +
+      (goal.achieved ? " — goal met" : ""),
+  );
+  return item;
+};
+
+if (goalForm && goalList && message) {
+  goalForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const goal = Object.fromEntries(new FormData(goalForm));
+    const button = goalForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    message.textContent = "";
+
+    try {
+      const saved = await fetchJSON("/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(goal),
+      });
+      goalList.append(buildGoalItem(saved));
+      message.textContent = "Goal saved successfully.";
+      goalForm.reset();
+    } catch (error) {
+      message.textContent = `Your goal was not saved. ${error.message}`;
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
 const methodFilter = document.querySelector("#method-filter");
 const totalEmissions = document.querySelector("#total-emissions");
 const activityCount = document.querySelector("#activity-count");
