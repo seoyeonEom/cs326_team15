@@ -103,17 +103,50 @@ Students can set weekly transportation goals and track their progress based on r
 
 **Progress calculation:** The service reads transportation activities from `data/activities.json` and counts the number of unique days with matching activities during the selected Monday–Sunday week. Multiple activities on the same day count as one completed day. A goal is marked as achieved when completed days meet or exceed the target.
 
+## Sprint 3 Features
+
+### 1. MongoDB Persistence
+
+Replaced JSON file storage with MongoDB using Mongoose. Transportation activities and weekly goals are now stored in separate collections with support for individual CRUD operations.
+
+**How to use:**
+
+1. Run `dc-up mongo` and `npm start`.
+2. Visit http://localhost:3000/activities or http://localhost:3000/goals and create a record.
+3. Restart the server and reload the page to confirm the data persists.
+4. Run `mongo-dev` and use `db.activities.find()` or `db.goals.find()` to inspect saved records.
+
+**Data persistence:** Mongoose repositories handle database operations instead of reading and rewriting JSON files. MongoDB ObjectIds are converted to client-facing `id` values through DTOs.
+
+### 2. Jest Unit Tests
+
+Added Jest tests for service-layer business rules, including input validation, emissions calculations, and weekly goal progress.
+
+**How to use:**
+
+1. Run `npm test` from the project root.
+2. Verify that all tests pass without MongoDB running.
+
+**Testing approach:** Tests in `__tests__/activitiesService.test.js` and `__tests__/goalsService.test.js` use `jest.unstable_mockModule()` to mock repositories and test services independently of the database.
+
+### 3. HTMX Partial Updates
+
+### 4. Tailwind CSS
+
 ## System Diagram
 
-The diagram below illustrates the architecture of the
-three Sprint 2 features and their shared data flow.
-
-![Sprint 2 System Architecture](docs/diagram.svg)
+![Sprint 3 System Architecture](docs/sprint3_diagram.svg)
 
 ## Design Decisions
+
+### Sprint 2
 
 **Seoyeon Eom**: For Transportation Activity Logging, I decided to keep input validation and carbon emission calculations in the service layer rather than the controller. An alternative would have been to handle these operations directly in the controller, which would have been simpler for a small application. However, separating the business logic from HTTP request handling makes the code easier to maintain and reuse. For example, if we add other ways to log activities in future sprints, we can reuse the same validation and calculation logic without duplicating it in different controllers. Although this approach requires more files and a slightly more complex structure, I think it is a better choice for our project's future development.
 
 **Sally Vakhtangishvili:** For the Transportation Emissions Breakdown feature, I chose to implement filtering and emissions aggregation in the service layer rather than calculating these values directly in the frontend. An alternative would have been to retrieve all activities and use browser-side JavaScript to filter and sum their emissions. While that approach would have avoided creating a new API endpoint, keeping the calculations in the service layer ensures that the same business logic can be reused by other parts of the application, including the dashboard. It also allows the backend to validate the transportation method consistently and return a clear error for invalid requests. This introduces an additional endpoint but makes the functionality easier to maintain and extend.
 
 **Willow Taylor:** Part of why I chose the date input is because Firefox doesn't support week inputs and shows a plain text box, so you'd have to type it by hand. And you'd still have to parse the string anyways, and there are a bunch of edge cases around New Year and a few other things, so the other option is best for my peace of mind. Also, snapping to monday means that you always get the same goals if you pick days in the same week. The rule successfully applies to any client, not only the form I cobbled together from looking a other commits. Dates are UTC midnight universally because of the potential difference between the server and client timezones. Checking whether an activity falls in a goal's week is a string comparison, so it's kind of simple.
+
+### Sprint 3
+
+**Seoyeon Eom**: I chose to replace JSON-based storage with Mongoose repositories using individual CRUD operations. An alternative was to keep the existing approach, which required fewer code changes but risked overwriting concurrent updates and becoming inefficient as data grows. Mongoose allows us to update individual records and use stable ObjectIds. Although this required changes to our services and DTOs, as well as additional database setup, I think it was worth the effort to make data storage more reliable.

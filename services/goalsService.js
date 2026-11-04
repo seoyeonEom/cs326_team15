@@ -2,7 +2,6 @@ import { Ok, Err } from "../result.js";
 import * as goalsRepository from "../repositories/goalsRepository.js";
 import * as activitiesRepository from "../repositories/activitiesRepository.js";
 import { toGoalDto } from "../dtos/goalDto.js";
-import { randomUUID } from "crypto";
 
 const METHODS = ["walking", "cycling", "bus", "car"];
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -14,7 +13,10 @@ const parseDate = (date) => {
     return null;
   }
   const parsed = new Date(`${date}T00:00:00.000Z`);
-  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) {
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.toISOString().slice(0, 10) !== date
+  ) {
     return null;
   }
   return parsed;
@@ -117,20 +119,27 @@ export const createGoal = async (data) => {
   const { weekStart, method, targetDays } = result.value;
   const goals = await goalsRepository.getAll();
 
-  const duplicate = goals.some(
-    (goal) => goal.weekStart === weekStart && goal.method === method,
-  );
-  if (duplicate) {
+  if (
+    goals.some((goal) => goal.weekStart === weekStart && goal.method === method)
+  ) {
     return Err({
       status: 409,
       message: `You already have a ${method} goal for the week of ${weekStart}.`,
     });
   }
 
-  const goal = { id: randomUUID(), weekStart, method, targetDays };
-  goals.push(goal);
-  await goalsRepository.save(goals);
+  let goal;
+  try {
+    goal = await goalsRepository.create({ weekStart, method, targetDays });
+  } catch (error) {
+    if (error?.code === 11000) {
+      return Err({
+        status: 409,
+        message: `You already have a ${method} goal for the week of ${weekStart}.`,
+      });
+    }
+    throw error;
+  }
 
-  const activities = await activitiesRepository.getAll();
-  return Ok(withProgress(goal, activities));
+  return Ok(withProgress(goal, await activitiesRepository.getAll()));
 };
