@@ -1,5 +1,5 @@
 export const toGoalDto = (goal) => ({
-  id: goal.id,
+  id: String(goal._id ?? goal.id),
   weekStart: goal.weekStart,
   weekEnd: goal.weekEnd,
   method: goal.method,

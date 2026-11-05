@@ -1,6 +1,13 @@
 import express from "express";
 import activitiesRouter from "./routes/activities.js";
 import goalsRouter from "./routes/goals.js";
+import mongoose from "mongoose";
+import activityRecordsRouter from "./routes/activityRecords.js";
+
+await mongoose.connect(
+  process.env.MONGODB_URI ||
+    "mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin",
+);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +35,7 @@ app.get("/dashboard", (req, res) => {
 });
 
 app.use("/activities", activitiesRouter);
+app.use("/activities", activityRecordsRouter);
 app.use("/goals", goalsRouter);
 
 app.use((req, res) => {

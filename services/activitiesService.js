@@ -1,7 +1,6 @@
 import { Ok, Err } from "../result.js";
-import { getAll, save } from "../repositories/activitiesRepository.js";
+import * as activitiesRepository from "../repositories/activitiesRepository.js";
 import { toActivityDto } from "../dtos/activityDto.js";
-import { randomUUID } from "crypto";
 
 const EMISSION_FACTORS = {
   walking: 0,
@@ -11,6 +10,18 @@ const EMISSION_FACTORS = {
 };
 
 const KM_PER_MILE = 1.609344;
+
+const withEmissions = ({ date, method, distance, unit }) => {
+  const distanceKm = unit === "mi" ? distance * KM_PER_MILE : distance;
+
+  return {
+    date,
+    method,
+    distance,
+    unit,
+    emissions: Number((distanceKm * EMISSION_FACTORS[method]).toFixed(3)),
+  };
+};
 
 const validDate = (date) => {
   if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -79,63 +90,38 @@ const validateActivity = (data) => {
   return Ok({ date, method, distance: Number(distance), unit });
 };
 
+export const listActivities = async () =>
+  (await activitiesRepository.getAll()).map(toActivityDto);
 
-export const listActivities = async (method) => {
-  const activities = await getAll();
-
-  const filteredActivities = method
-    ? activities.filter((activity) => activity.method === method)
-    : activities;
-
-  return filteredActivities.map(toActivityDto);
+export const getActivity = async (id) => {
+  const activity = await activitiesRepository.findById(id);
+  if (!activity) return Err({ status: 404, message: "Activity not found." });
+  return Ok(toActivityDto(activity));
 };
-
-export const getEmissionsBreakdown = async (method) => {
-  const validMethods = ["walking", "cycling", "bus", "car"];
-
-  if (method !== undefined && !validMethods.includes(method)) {
-    return Err({
-      status: 400,
-      message: "Invalid transportation method."
-    });
-  }
-
-  const activities = await listActivities(method);
-  
-  const totalEmissions = activities.reduce(
-    (total, activity) => total + activity.emissions,
-    0
-  );
-
-  return Ok({
-    activities,
-    totalEmissions: Number(totalEmissions.toFixed(3)),
-    activityCount: activities.length
-  });
-};
-
-
 
 export const createActivity = async (data) => {
   const result = validateActivity(data);
   if (!result.ok) return result;
+  const saved = await activitiesRepository.create(withEmissions(result.value));
+  return Ok(toActivityDto(saved));
+};
 
-  const { date, method, distance, unit } = result.value;
-  const distanceKm = unit === "mi" ? distance * KM_PER_MILE : distance;
-  const emissions = Number((distanceKm * EMISSION_FACTORS[method]).toFixed(3));
+export const updateActivity = async (id, data) => {
+  const existing = await activitiesRepository.findById(id);
+  if (!existing) return Err({ status: 404, message: "Activity not found." });
+  const result = validateActivity(data);
+  if (!result.ok) return result;
+  const updated = await activitiesRepository.updateById(
+    id,
+    withEmissions(result.value),
+  );
+  if (!updated) return Err({ status: 404, message: "Activity not found." });
+  return Ok(toActivityDto(updated));
+};
 
-  const activity = {
-    id: randomUUID(),
-    date,
-    method,
-    distance,
-    unit,
-    emissions,
-  };
-
-  const activities = await getAll();
-
-  activities.push(activity);
-  await save(activities);
-  return Ok(toActivityDto(activity));
+export const deleteActivity = async (id) => {
+  const existing = await activitiesRepository.findById(id);
+  if (!existing) return Err({ status: 404, message: "Activity not found." });
+  await activitiesRepository.removeById(id);
+  return Ok(null);
 };

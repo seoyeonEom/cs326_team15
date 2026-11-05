@@ -1,23 +1,46 @@
-import { readFile, writeFile } from "fs/promises";
+import mongoose from "mongoose";
 
-const DATA_FILE = "data/goals.json";
+const goalSchema = new mongoose.Schema(
+  {
+    weekStart: {
+      type: String,
+      required: true,
+    },
+    method: {
+      type: String,
+      required: true,
+      enum: ["walking", "cycling", "bus", "car"],
+    },
+    targetDays: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 7,
+    },
+  },
+  { timestamps: true },
+);
 
-export const getAll = async () => {
-  try {
-    const data = await readFile(DATA_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    // A fresh clone with no goals file yet just means no goals.
-    if (error.code === "ENOENT") return [];
-    throw error;
-  }
-};
+// Prevent duplicate goals for the same week and method.
+goalSchema.index({ weekStart: 1, method: 1 }, { unique: true });
 
-export const findById = async (id) => {
-  const goals = await getAll();
-  return goals.find((goal) => goal.id === id) ?? null;
-};
+const Goal = mongoose.model("Goal", goalSchema);
 
-export const save = async (goals) => {
-  await writeFile(DATA_FILE, JSON.stringify(goals, null, 2));
-};
+export const isValidId = (id) =>
+  typeof id === "string" &&
+  /^[a-f\d]{24}$/i.test(id) &&
+  mongoose.Types.ObjectId.isValid(id);
+
+export const getAll = async () => Goal.find().sort({ _id: 1 }).lean();
+
+export const findById = async (id) => Goal.findById(id).lean();
+
+export const create = async (data) => (await Goal.create(data)).toObject();
+
+export const updateById = async (id, data) =>
+  Goal.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  }).lean();
+
+export const removeById = async (id) => Goal.findByIdAndDelete(id).lean();
