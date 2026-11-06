@@ -119,9 +119,10 @@ export const createGoal = async (data) => {
   const { weekStart, method, targetDays } = result.value;
   const goals = await goalsRepository.getAll();
 
-  if (
-    goals.some((goal) => goal.weekStart === weekStart && goal.method === method)
-  ) {
+  const duplicate = goals.some(
+    (goal) => goal.weekStart === weekStart && goal.method === method,
+  );
+  if (duplicate) {
     return Err({
       status: 409,
       message: `You already have a ${method} goal for the week of ${weekStart}.`,
@@ -129,8 +130,13 @@ export const createGoal = async (data) => {
   }
 
   let goal;
+
   try {
-    goal = await goalsRepository.create({ weekStart, method, targetDays });
+    goal = await goalsRepository.create({
+      weekStart,
+      method,
+      targetDays,
+    });
   } catch (error) {
     if (error?.code === 11000) {
       return Err({
@@ -141,5 +147,6 @@ export const createGoal = async (data) => {
     throw error;
   }
 
-  return Ok(withProgress(goal, await activitiesRepository.getAll()));
+  const activities = await activitiesRepository.getAll();
+  return Ok(withProgress(goal, activities));
 };
