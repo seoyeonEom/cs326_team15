@@ -1,29 +1,64 @@
-<p>Total CO2 emissions:
-  <strong id="total-emissions"><%= breakdown.totalEmissions %> kg CO₂</strong>
-</p>
-<p>Number of activities:
-  <strong id="activity-count"><%= breakdown.activityCount %></strong>
-</p>
+<div class="my-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <div class="rounded-xl bg-emerald-50 p-4">
+    <p class="text-sm font-medium text-emerald-800">
+      Total CO2 emissions
+    </p>
 
-<h3>Saved Activities</h3>
+    <strong
+      id="total-emissions"
+      class="mt-2 block break-words text-2xl text-emerald-900"
+    >
+      <%= breakdown.totalEmissions %> kg CO₂
+    </strong>
+  </div>
+
+  <div class="rounded-xl bg-slate-100 p-4">
+    <p class="text-sm font-medium text-slate-600">
+      Number of activities
+    </p>
+
+    <strong
+      id="activity-count"
+      class="mt-2 block text-2xl text-slate-900"
+    >
+      <%= breakdown.activityCount %>
+    </strong>
+  </div>
+</div>
+
+<h3 class="mb-3 text-lg font-semibold">
+  Saved Activities
+</h3>
+
 <% if (breakdown.activities.length === 0) { %>
-<p class="note">No activities to show.</p>
+  <p class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-600">
+    No activities to show.
+  </p>
 <% } else { %>
-<ul id="activities">
-  <% breakdown.activities.forEach((activity) => { %>
-  <li class="activity-item">
-    <span>
-      <strong><%= activity.date %></strong> — <%= activity.method %>, <%= activity.distance %> <%= activity.unit %> — <%= activity.emissions %> kg CO2
-    </span>
-    <button type="button" class="delete-button"
-            hx-delete="/activities/<%= activity.id %>"
-            hx-target="closest li"
-            hx-swap="outerHTML"
-            hx-confirm="Delete this activity?"
-            aria-label="Delete the <%= activity.method %> activity on <%= activity.date %>">
-      Delete
-    </button>
-  </li>
-  <% }); %>
-</ul>
+  <ul id="activities" class="space-y-3">
+    <% breakdown.activities.forEach((activity) => { %>
+      <li class="activity-item flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <span class="min-w-0 break-words text-sm leading-6 text-slate-700">
+          <strong class="text-slate-900">
+            <%= activity.date %>
+          </strong>
+          — <%= activity.method %>,
+          <%= activity.distance %> <%= activity.unit %>
+          — <%= activity.emissions %> kg CO₂
+        </span>
+
+        <button
+          type="button"
+          class="delete-button min-h-11 shrink-0 cursor-pointer rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+          hx-delete="/activities/<%= activity.id %>"
+          hx-target="closest li"
+          hx-swap="outerHTML"
+          hx-confirm="Delete this activity?"
+          aria-label="Delete the <%= activity.method %> activity on <%= activity.date %>"
+        >
+          Delete
+        </button>
+      </li>
+    <% }); %>
+  </ul>
 <% } %>
