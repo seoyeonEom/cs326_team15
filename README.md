@@ -40,13 +40,21 @@ Follow these steps to run the application locally.
    npm install
    ```
 
-3. Start the Express server from the project root
+3. Start MongoDB from the dev container
+
+   ```bash
+   dc-up mongo
+   ```
+
+   The server connects to `mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin` by default. To use a different MongoDB (for example a local install at `mongodb://localhost:27017/devdb`), set `MONGODB_URI` before starting the server. If MongoDB is not reachable, the server exits after five seconds with a message saying so.
+
+4. Start the Express server from the project root
 
    ```bash
    npm start
    ```
 
-4. Access the application
+5. Access the application
    - **Home page:** [http://localhost:3000](http://localhost:3000)
    - **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
    - **Transportation Activities:** [http://localhost:3000/activities](http://localhost:3000/activities)
@@ -118,6 +126,15 @@ Replaced JSON file storage with MongoDB using Mongoose. Transportation activitie
 
 **Data persistence:** Mongoose repositories handle database operations instead of reading and rewriting JSON files. MongoDB ObjectIds are converted to client-facing `id` values through DTOs.
 
+**Routes that hit MongoDB:** every `/activities` and `/goals` route goes through a Mongoose repository. Single records are reached by their MongoDB id:
+
+- `GET /activities/:id`, `PUT /activities/:id`, `DELETE /activities/:id`
+- `GET /goals/:id`
+
+An id that is not a valid ObjectId gets a 400 before the database is queried; a valid id with no record gets a 404.
+
+**Client-facing ids:** none of our views or client-side scripts used an array position as an id. Sprint 2 already gave each record a UUID, and no page displayed or sent an id. So nothing had to change from an array index to the real id. The first client-facing id is the new **Delete** button (see HTMX below), which uses the MongoDB `_id`, exposed as `id` by the DTO.
+
 ### 2. Jest Unit Tests
 
 Added Jest tests for service-layer business rules, including input validation, emissions calculations, and weekly goal progress.
@@ -130,6 +147,22 @@ Added Jest tests for service-layer business rules, including input validation, e
 **Testing approach:** Tests in `__tests__/activitiesService.test.js` and `__tests__/goalsService.test.js` use `jest.unstable_mockModule()` to mock repositories and test services independently of the database.
 
 ### 3. HTMX Partial Updates
+
+The transportation filter on the activities page now uses HTMX instead of a hand-written `fetch` call and manual DOM updates. Each saved activity also has a **Delete** button that uses HTMX.
+
+**How to use:**
+
+1. Visit http://localhost:3000/activities and save a few activities.
+2. Change **Filter by transportation method**. Only the totals and the activity list change: the address bar stays the same, and the Network tab shows one `GET /activities/breakdown?method=...` request.
+3. Click **Delete** on an activity and confirm. That row disappears and the totals update, again without a page reload.
+4. To see the partial the server sends: `curl -s -H 'HX-Request: true' "http://localhost:3000/activities/breakdown?method=bus"`
+
+**How it works:**
+
+- `views/activities.ejs` loads htmx 2.0.11. The filter `<select>` has `hx-get="/activities/breakdown"`, `hx-target="#breakdown-results"` and `hx-trigger="change, activities-changed from:body"`.
+- `GET /activities/breakdown` checks the `HX-Request` header. HTMX gets the HTML fragment in `views/partials/breakdown.ejs` (totals and list, no `<html>` or `<body>`). Any other client still gets the JSON from Sprint 2. The same partial renders the list when the page first loads, so there is no fetch on load.
+- Each **Delete** button has `hx-delete="/activities/<id>"`, `hx-target="closest li"` and `hx-swap="outerHTML"`. The server answers an HTMX delete with an empty `200` (HTMX does not swap a `204`), so the row is removed. It also sends an `HX-Trigger: activities-changed` header, and the filter re-fetches its partial so the totals stay correct.
+- Saving an activity still posts JSON from `public/app.js`. After a successful save, it fires the same `activities-changed` event to refresh the breakdown. The old `refreshBreakdown` / `buildItem` code is gone.
 
 ### 4. Tailwind CSS
 
@@ -150,3 +183,5 @@ Added Jest tests for service-layer business rules, including input validation, e
 ### Sprint 3
 
 **Seoyeon Eom**: I chose to replace JSON-based storage with Mongoose repositories using individual CRUD operations. An alternative was to keep the existing approach, which required fewer code changes but risked overwriting concurrent updates and becoming inefficient as data grows. Mongoose allows us to update individual records and use stable ObjectIds. Although this required changes to our services and DTOs, as well as additional database setup, I think it was worth the effort to make data storage more reliable.
+
+**Willow Taylor**:the delete returns an empty 200 plus an HX-Trigger header, and the filter re-fetches. that’s two requests, but it keeps Unit 14’s delete pattern and reuses the same refresh the save form triggers. an alternative might be that the delete returns the whole re-rendered breakdown in one request. the cost, of course is that the delete button has to send the current filter, and the record controller has to know how to render the breakdown.

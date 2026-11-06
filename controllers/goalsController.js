@@ -1,4 +1,5 @@
 import * as goalsService from "../services/goalsService.js";
+import { isValidId } from "../repositories/goalsRepository.js";
 
 export const index = async (req, res) => {
   const goals = await goalsService.listGoals();
@@ -12,7 +13,12 @@ export const list = async (req, res) => {
 };
 
 export const show = async (req, res) => {
-  const result = await goalsService.getGoal(req.params.id);
+  const { id } = req.params;
+  if (!isValidId(id)) {
+    res.status(400).json({ error: "id must be a valid id" });
+    return;
+  }
+  const result = await goalsService.getGoal(id);
   if (!result.ok) {
     res.status(result.error.status).json({ error: result.error.message });
     return;

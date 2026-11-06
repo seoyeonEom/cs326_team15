@@ -22,7 +22,6 @@ nav a {
   margin-right: 1rem;
 }
 
-/*transform activity*/
 #goal-form,
 #activity-form {
   display: flex;
@@ -64,7 +63,6 @@ nav a {
   cursor: not-allowed;
 }
 
-/*saved activity*/
 
 ul {
   display: flex;
@@ -85,7 +83,6 @@ li.achieved {
   background-color: #eef7ee;
 }
 
-/*feedback message*/
 #message {
   min-height: 1.5rem;
   font-weight: bold;
@@ -94,4 +91,32 @@ li.achieved {
 .note {
   color: #555;
   font-size: 0.9rem;
+}
+
+#method-filter {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.delete-button {
+  flex-shrink: 0;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #b3261e;
+  border-radius: 4px;
+  background-color: white;
+  color: #b3261e;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #fdecea;
 }
