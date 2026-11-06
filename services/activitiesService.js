@@ -93,6 +93,34 @@ const validateActivity = (data) => {
 export const listActivities = async () =>
   (await activitiesRepository.getAll()).map(toActivityDto);
 
+// Sprint 2's breakdown, rebuilt on the per-record repository.
+// An empty method ("All transportation") means no filter.
+export const getEmissionsBreakdown = async (method) => {
+  const filter = method === undefined || method === "" ? null : method;
+
+  if (
+    filter !== null &&
+    (typeof filter !== "string" || !Object.hasOwn(EMISSION_FACTORS, filter))
+  ) {
+    return Err({ status: 400, message: "Invalid transportation method." });
+  }
+
+  const activities = (await activitiesRepository.getAll())
+    .filter((activity) => filter === null || activity.method === filter)
+    .map(toActivityDto);
+
+  const totalEmissions = activities.reduce(
+    (total, activity) => total + activity.emissions,
+    0,
+  );
+
+  return Ok({
+    activities,
+    totalEmissions: Number(totalEmissions.toFixed(3)),
+    activityCount: activities.length,
+  });
+};
+
 export const getActivity = async (id) => {
   const activity = await activitiesRepository.findById(id);
   if (!activity) return Err({ status: 404, message: "Activity not found." });

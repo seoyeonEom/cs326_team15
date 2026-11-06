@@ -27,6 +27,10 @@ export const destroy = async (req, res) => {
   const result = await activitiesService.deleteActivity(id);
   if (!result.ok) return sendError(res, result);
   // Unit 14: an HTMX outerHTML deletion needs an empty HTTP 200, not 204.
-  if (req.get("HX-Request") === "true") return res.status(200).send("");
+  // HX-Trigger tells the breakdown to re-fetch so the totals stay correct.
+  if (req.get("HX-Request") === "true") {
+    res.set("HX-Trigger", "activities-changed");
+    return res.status(200).send("");
+  }
   return res.status(204).send();
 };

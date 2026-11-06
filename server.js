@@ -4,10 +4,20 @@ import goalsRouter from "./routes/goals.js";
 import mongoose from "mongoose";
 import activityRecordsRouter from "./routes/activityRecords.js";
 
-await mongoose.connect(
+const MONGODB_URI =
   process.env.MONGODB_URI ||
-    "mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin",
-);
+  "mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin";
+
+try {
+  await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+} catch (error) {
+  console.error(
+    "Could not connect to MongoDB. Start the dev container's database " +
+      "with `dc-up mongo`, or set MONGODB_URI to another instance.",
+  );
+  console.error(error.message);
+  process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;

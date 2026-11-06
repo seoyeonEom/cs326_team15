@@ -1,5 +1,4 @@
 const form = document.querySelector("#activity-form");
-const list = document.querySelector("#activities");
 const message = document.querySelector("#message");
 
 const timedFetch = (url, options = {}) =>
@@ -28,19 +27,12 @@ const fetchJSON = async (url, options = {}) => {
   return body;
 };
 
-const buildItem = (activity) => {
-  const item = document.createElement("li");
-  const date = document.createElement("strong");
-  date.textContent = activity.date;
-  item.append(
-    date,
-    ` — ${activity.method}, ${activity.distance} ${activity.unit} — ` +
-      `${activity.emissions} kg CO2`,
-  );
-  return item;
-};
+// The breakdown's hx-trigger listens for this event and re-fetches its
+// partial, so saving an activity refreshes the totals and the list.
+const announceActivitiesChanged = () =>
+  document.body.dispatchEvent(new Event("activities-changed"));
 
-if (form && list && message) {
+if (form && message) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const activity = Object.fromEntries(new FormData(form));
@@ -49,19 +41,14 @@ if (form && list && message) {
     message.textContent = "";
 
     try {
-      const saved = await fetchJSON("/activities", {
+      await fetchJSON("/activities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(activity),
       });
       form.reset();
       message.textContent = "Activity saved successfully.";
-      try {
-        await refreshBreakdown();
-      } catch (error) {
-        message.textContent =
-          `Activity saved, but the breakdown could not be refreshed: ${error.message}`;
-      }
+      announceActivitiesChanged();
     } catch (error) {
       message.textContent = `Your activity was not saved. ${error.message}`;
     } finally {
@@ -110,38 +97,38 @@ if (goalForm && goalList && message) {
     }
   });
 }
-const methodFilter = document.querySelector("#method-filter");
-const totalEmissions = document.querySelector("#total-emissions");
-const activityCount = document.querySelector("#activity-count");
 
-const refreshBreakdown = async () => {
-  const method = methodFilter.value;
-  const query = method ? `?method=${encodeURIComponent(method)}` : "";
-
-  const breakdown = await fetchJSON(`/activities/breakdown${query}`);
-
-  totalEmissions.textContent = `${breakdown.totalEmissions} kg CO₂`;
-  activityCount.textContent = breakdown.activityCount;
-
-  list.replaceChildren();
-
-  breakdown.activities.forEach((activity) => {
-    list.append(buildItem(activity));
-  });
+// HTMX requests (the filter and the delete buttons) report failures in the
+// same status line the forms use.
+const htmxErrorText = (xhr) => {
+  const fallback = `The server answered ${xhr.status}.`;
+  try {
+    return JSON.parse(xhr.responseText).error || fallback;
+  } catch {
+    return fallback;
+  }
 };
 
-if (methodFilter && totalEmissions && activityCount && list && message) {
-  methodFilter.addEventListener("change", async () => {
-    try {
-      await refreshBreakdown();
-      message.textContent = "";
-    } catch (error) {
-      message.textContent = `Could not load breakdown. ${error.message}`;
-    }
-  });
-
-  refreshBreakdown().catch((error) => {
-    message.textContent = `Could not load breakdown. ${error.message}`;
+const methodFilter = document.querySelector("#method-filter");
+if (methodFilter && message) {
+  methodFilter.addEventListener("change", () => {
+    message.textContent = "";
   });
 }
 
+if (message) {
+  document.body.addEventListener("htmx:afterRequest", (event) => {
+    if (event.detail.successful && event.detail.requestConfig.verb === "delete") {
+      message.textContent = "Activity deleted.";
+    }
+  });
+  document.body.addEventListener("htmx:responseError", (event) => {
+    message.textContent = `That didn't work. ${htmxErrorText(event.detail.xhr)}`;
+  });
+  document.body.addEventListener("htmx:sendError", () => {
+    message.textContent = "Could not reach the server.";
+  });
+  document.body.addEventListener("htmx:timeout", () => {
+    message.textContent = "The server did not answer within five seconds.";
+  });
+}

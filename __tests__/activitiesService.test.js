@@ -189,3 +189,56 @@ test("deleteActivity calls removeById for a real record", async () => {
   expect(result).toEqual({ ok: true, value: null });
   expect(repo.removeById).toHaveBeenCalledWith("a1");
 });
+
+const storedActivities = [
+  { _id: "a1", ...valid, method: "bus", emissions: 0.1 },
+  { _id: "a2", ...valid, method: "bus", emissions: 0.2 },
+  { _id: "a3", ...valid, method: "car", emissions: 1 },
+];
+
+test.each(["train", "Car", ["bus"], "constructor"])(
+  "getEmissionsBreakdown rejects invalid method %p",
+  async (method) => {
+    const result = await service.getEmissionsBreakdown(method);
+    expect(result).toEqual({
+      ok: false,
+      error: { status: 400, message: "Invalid transportation method." },
+    });
+    expect(repo.getAll).not.toHaveBeenCalled();
+  },
+);
+
+test.each([undefined, ""])(
+  "getEmissionsBreakdown with method %p totals every activity",
+  async (method) => {
+    repo.getAll.mockResolvedValue(storedActivities);
+    const result = await service.getEmissionsBreakdown(method);
+    expect(result.ok).toBe(true);
+    expect(result.value.activityCount).toBe(3);
+    expect(result.value.totalEmissions).toBe(1.3);
+    expect(result.value.activities.map((a) => a.id)).toEqual([
+      "a1",
+      "a2",
+      "a3",
+    ]);
+  },
+);
+
+test("getEmissionsBreakdown filters by method and rounds the total", async () => {
+  repo.getAll.mockResolvedValue(storedActivities);
+  const result = await service.getEmissionsBreakdown("bus");
+  expect(result.value.activityCount).toBe(2);
+  // 0.1 + 0.2 is 0.30000000000000004 in floating point
+  expect(result.value.totalEmissions).toBe(0.3);
+  expect(result.value.activities.every((a) => a.method === "bus")).toBe(true);
+});
+
+test("getEmissionsBreakdown returns zeros when nothing matches", async () => {
+  repo.getAll.mockResolvedValue(storedActivities);
+  const result = await service.getEmissionsBreakdown("walking");
+  expect(result.value).toEqual({
+    activities: [],
+    totalEmissions: 0,
+    activityCount: 0,
+  });
+});

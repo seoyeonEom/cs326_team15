@@ -1,0 +1,29 @@
+<p>Total CO2 emissions:
+  <strong id="total-emissions"><%= breakdown.totalEmissions %> kg CO₂</strong>
+</p>
+<p>Number of activities:
+  <strong id="activity-count"><%= breakdown.activityCount %></strong>
+</p>
+
+<h3>Saved Activities</h3>
+<% if (breakdown.activities.length === 0) { %>
+<p class="note">No activities to show.</p>
+<% } else { %>
+<ul id="activities">
+  <% breakdown.activities.forEach((activity) => { %>
+  <li class="activity-item">
+    <span>
+      <strong><%= activity.date %></strong> — <%= activity.method %>, <%= activity.distance %> <%= activity.unit %> — <%= activity.emissions %> kg CO2
+    </span>
+    <button type="button" class="delete-button"
+            hx-delete="/activities/<%= activity.id %>"
+            hx-target="closest li"
+            hx-swap="outerHTML"
+            hx-confirm="Delete this activity?"
+            aria-label="Delete the <%= activity.method %> activity on <%= activity.date %>">
+      Delete
+    </button>
+  </li>
+  <% }); %>
+</ul>
+<% } %>

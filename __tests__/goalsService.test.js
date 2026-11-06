@@ -120,6 +120,11 @@ test("createGoal counts only distinct days in its week and matching method", asy
   expect(result.value.achieved).toBe(true);
 });
 
+test("createGoal rethrows database errors that are not duplicate keys", async () => {
+  goalsRepo.create.mockRejectedValue(new Error("connection lost"));
+  await expect(service.createGoal(valid)).rejects.toThrow("connection lost");
+});
+
 test("createGoal maps a database duplicate-key error to 409", async () => {
   goalsRepo.create.mockRejectedValue({ code: 11000 });
   const result = await service.createGoal(valid);
