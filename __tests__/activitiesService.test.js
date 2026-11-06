@@ -188,6 +188,39 @@ test("deleteActivity calls removeById for a real record", async () => {
   const result = await service.deleteActivity("a1");
   expect(result).toEqual({ ok: true, value: null });
   expect(repo.removeById).toHaveBeenCalledWith("a1");
+  expect(repo.removeById).toHaveBeenCalledTimes(1);
+});
+
+test("deleteActivity returns 404 if the record disappears during deletion", async () => {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    emissions: 0,
+  });
+
+  repo.removeById.mockResolvedValue(null);
+
+  const result = await service.deleteActivity("a1");
+
+  expect(result).toEqual({
+    ok: false,
+    error: {
+      status: 404,
+      message: "Activity not found.",
+    },
+  });
+
+  expect(repo.removeById).toHaveBeenCalledWith("a1");
+});
+
+test("deleteActivity does not attempt deletion if the record does not exist", async () => {
+  repo.findById.mockResolvedValue(null);
+
+  const result = await service.deleteActivity("missing");
+
+  expect(result.ok).toBe(false);
+  expect(result.error.status).toBe(404);
+  expect(repo.removeById).not.toHaveBeenCalled();
 });
 
 const storedActivities = [

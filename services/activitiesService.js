@@ -149,7 +149,16 @@ export const updateActivity = async (id, data) => {
 
 export const deleteActivity = async (id) => {
   const existing = await activitiesRepository.findById(id);
-  if (!existing) return Err({ status: 404, message: "Activity not found." });
-  await activitiesRepository.removeById(id);
+
+  if (!existing) {
+    return Err({ status: 404, message: "Activity not found." });
+  }
+
+  const deleted = await activitiesRepository.removeById(id);
+
+  if (!deleted) {
+    return Err({ status: 404, message: "Activity not found." });
+  }
+
   return Ok(null);
 };
