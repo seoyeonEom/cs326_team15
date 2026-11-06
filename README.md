@@ -166,6 +166,10 @@ The transportation filter on the activities page now uses HTMX instead of a hand
 
 ### 4. Tailwind CSS
 
+Restyled `/activities` and `/goals` with Tailwind utility classes for forms, navigation, summary cards, and lists. Forms use one column on mobile and two columns on larger screens with `sm:grid-cols-2`.
+
+**How to see it:** Run `npm install` and `npm start`, which automatically builds `src/input.css` into `public/style.css`. Visit `/activities` and `/goals` at 375px and 1280px widths to check the layout. Activity filtering and deletion continue to use HTMX.
+
 ## System Diagram
 
 ![Sprint 3 System Architecture](docs/sprint3_diagram.svg)
@@ -185,3 +189,5 @@ The transportation filter on the activities page now uses HTMX instead of a hand
 **Seoyeon Eom**: I chose to replace JSON-based storage with Mongoose repositories using individual CRUD operations. An alternative was to keep the existing approach, which required fewer code changes but risked overwriting concurrent updates and becoming inefficient as data grows. Mongoose allows us to update individual records and use stable ObjectIds. Although this required changes to our services and DTOs, as well as additional database setup, I think it was worth the effort to make data storage more reliable.
 
 **Willow Taylor**:the delete returns an empty 200 plus an HX-Trigger header, and the filter re-fetches. that’s two requests, but it keeps Unit 14’s delete pattern and reuses the same refresh the save form triggers. an alternative might be that the delete returns the whole re-rendered breakdown in one request. the cost, of course is that the delete button has to send the current filter, and the record controller has to know how to render the breakdown.
+
+**Sally Vakhtangishvili:** During Sprint 3, I chose to verify the actual result of MongoDB's deletion operation instead of relying solely on an initial existence check. An alternative would have been to assume deletion succeeded whenever `findById()` located the activity. However, another request could delete the same record between the existence check and the deletion, causing the application to incorrectly report success. By checking whether `removeById()` returns a deleted document, the service can return an accurate 404 response when the record no longer exists. This approach requires an additional conditional check but improves reliability and consistency. I also added Jest regression tests to verify this behavior.

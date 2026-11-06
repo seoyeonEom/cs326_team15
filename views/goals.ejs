@@ -2,45 +2,104 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/style.css">
   </head>
-  <body>
-<%- include('partials/header') %>
-    <main>
-      <h2>Set a Weekly Goal</h2>
-      <form id="goal-form">
-        <label>Week of (any day in the week)
-          <input type="date" name="week" required>
-        </label>
-        <label>Transportation method
-          <select name="method" required>
-            <option value="">Select a method</option>
-            <option value="walking">Walking</option>
-            <option value="cycling">Cycling</option>
-            <option value="bus">Bus</option>
-            <option value="car">Car</option>
-          </select>
-        </label>
-        <label>Target days
-          <input type="number" name="targetDays" min="1" max="7" step="1" required>
-        </label>
-        <button type="submit">Save goal</button>
-      </form>
-      <p class="note">
-        Weeks run Monday to Sunday. Progress counts each day with a matching activity, which you should be sure to update once a day.
-      </p>
 
-      <p id="message" role="status" aria-live="polite"></p>
-      <h2>Your Goals</h2>
-      <ul id="goals">
-<% goals.forEach((goal) => { %>
-        <li class="<%= goal.achieved ? 'achieved' : '' %>">
-          <strong><%= goal.weekStart %> to <%= goal.weekEnd %></strong> — <%= goal.method %> — <%= goal.completedDays %>/<%= goal.targetDays %> days<%= goal.achieved ? ' — goal met' : '' %>
-        </li>
-<% }); %>
-      </ul>
+  <body class="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <%- include('partials/header') %>
+
+    <main class="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
+      <section aria-labelledby="goal-title">
+        <h2 id="goal-title" class="mb-4 text-xl font-bold tracking-tight">
+          Set a Weekly Goal
+        </h2>
+
+        <form
+          id="goal-form"
+          class="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 sm:p-6"
+        >
+          <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+            Week of (any day in the week)
+            <input
+              type="date"
+              name="week"
+              required
+              class="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            >
+          </label>
+
+          <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+            Transportation method
+            <select
+              name="method"
+              required
+              class="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            >
+              <option value="">Select a method</option>
+              <option value="walking">Walking</option>
+              <option value="cycling">Cycling</option>
+              <option value="bus">Bus</option>
+              <option value="car">Car</option>
+            </select>
+          </label>
+
+          <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+            Target days
+            <input
+              type="number"
+              name="targetDays"
+              min="1"
+              max="7"
+              step="1"
+              required
+              class="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            >
+          </label>
+
+          <button
+            type="submit"
+            class="min-h-11 w-full cursor-pointer rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2 sm:w-auto sm:justify-self-start"
+          >
+            Save goal
+          </button>
+        </form>
+
+        <p class="mt-3 text-sm leading-6 text-slate-600">
+          Weeks run Monday to Sunday. Progress counts each day with a matching
+          activity, which you should be sure to update once a day.
+        </p>
+      </section>
+
+      <p
+        id="message"
+        class="min-h-6 break-words text-sm font-medium text-slate-700"
+        role="status"
+        aria-live="polite"
+      ></p>
+
+      <section
+        aria-labelledby="goals-title"
+        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      >
+        <h2 id="goals-title" class="mb-4 text-xl font-bold tracking-tight">
+          Your Goals
+        </h2>
+
+        <ul id="goals" class="space-y-3">
+          <% goals.forEach((goal) => { %>
+            <li class="rounded-xl border p-4 text-sm leading-6 <%= goal.achieved ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white' %>">
+              <strong><%= goal.weekStart %> to <%= goal.weekEnd %></strong>
+              — <%= goal.method %>
+              — <%= goal.completedDays %>/<%= goal.targetDays %> days
+              <%= goal.achieved ? ' — goal met' : '' %>
+            </li>
+          <% }); %>
+        </ul>
+      </section>
     </main>
+
     <script src="/app.js" defer></script>
   </body>
 </html>
