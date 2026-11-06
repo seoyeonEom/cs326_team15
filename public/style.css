@@ -110,13 +110,13 @@ li.achieved {
 .delete-button {
   flex-shrink: 0;
   padding: 0.35rem 0.75rem;
-  border: 1px solid #b3261e;
+  border: 1px solid #ff0d00;
   border-radius: 4px;
-  background-color: white;
-  color: #b3261e;
+  background-color: rgb(34, 8, 8);
+  color: #ffffff;
   cursor: pointer;
 }
 
 .delete-button:hover {
-  background-color: #fdecea;
+  background-color: #ff1900;
 }
