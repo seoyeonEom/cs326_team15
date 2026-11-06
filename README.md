@@ -166,6 +166,10 @@ The transportation filter on the activities page now uses HTMX instead of a hand
 
 ### 4. Tailwind CSS
 
+Restyled `/activities` and `/goals` with Tailwind utility classes for forms, navigation, summary cards, and lists. Forms use one column on mobile and two columns on larger screens with `sm:grid-cols-2`.
+
+**How to see it:** Run `npm install` and `npm start`, which automatically builds `src/input.css` into `public/style.css`. Visit `/activities` and `/goals` at 375px and 1280px widths to check the layout. Activity filtering and deletion continue to use HTMX.
+
 ## System Diagram
 
 ![Sprint 3 System Architecture](docs/sprint3_diagram.svg)

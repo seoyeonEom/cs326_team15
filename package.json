@@ -4,9 +4,11 @@
   "description": "Carbon Footprint Tracker",
   "main": "server.js",
   "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/style.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/style.css --watch",
+    "prestart": "npm run build:css",
     "start": "node server.js",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
-    "build:css": "tailwindcss -i ./src/input.css -o ./public/style.css"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand"
   },
   "repository": {
     "type": "git",
@@ -28,8 +30,5 @@
     "@tailwindcss/cli": "^4.3.4",
     "jest": "^30.5.2",
     "tailwindcss": "^4.3.4"
-  },
-  "directories": {
-    "doc": "docs"
   }
 }
