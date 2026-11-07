@@ -3,6 +3,16 @@ import activitiesRouter from "./routes/activities.js";
 import goalsRouter from "./routes/goals.js";
 import mongoose from "mongoose";
 import activityRecordsRouter from "./routes/activityRecords.js";
+import cookieParser from "cookie-parser";
+import { attachUser } from "./middleware/attachUser.js";
+
+const app = express();
+app.disable("x-powered-by");
+const PORT = process.env.PORT || 3000;
+
+//TODO: Change session secret in production
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || "dev-secret-change-in-production";
 
 const MONGODB_URI =
   process.env.MONGODB_URI ||
@@ -18,10 +28,6 @@ try {
   console.error(error.message);
   process.exit(1);
 }
-
-const app = express();
-app.disable("x-powered-by");
-const PORT = process.env.PORT || 3000;
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -44,6 +50,9 @@ app.get("/dashboard", (req, res) => {
     <p><a href="/activities">Transportation Activities</a></p>
   `);
 });
+
+app.use(cookieParser(SESSION_SECRET));
+app.use(attachUser);
 
 app.use("/activities", activitiesRouter);
 app.use("/activities", activityRecordsRouter);
