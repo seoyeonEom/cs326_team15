@@ -5,12 +5,12 @@ import mongoose from "mongoose";
 import activityRecordsRouter from "./routes/activityRecords.js";
 import cookieParser from "cookie-parser";
 import { attachUser } from "./middleware/attachUser.js";
+import authRouter from "./routes/auth.js";
 
 const app = express();
 app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
 
-//TODO: Change session secret in production
 const SESSION_SECRET =
   process.env.SESSION_SECRET || "dev-secret-change-in-production";
 
@@ -54,6 +54,7 @@ app.get("/dashboard", (req, res) => {
 app.use(cookieParser(SESSION_SECRET));
 app.use(attachUser);
 
+app.use(authRouter);
 app.use("/activities", activitiesRouter);
 app.use("/activities", activityRecordsRouter);
 app.use("/goals", goalsRouter);

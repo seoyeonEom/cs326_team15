@@ -23,7 +23,9 @@ export const signup = async ({ email, password }) => {
 };
 
 export const login = async ({ email, password }) => {
-  const user = await userRepository.create((email || "").trim().toLowerCase());
+  const user = await userRepository.findByEmail(
+    (email || "").trim().toLowerCase(),
+  );
   if (!user)
     return Err({ status: 401, message: "incorrect email or password" });
 
