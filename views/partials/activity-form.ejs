@@ -1,0 +1,42 @@
+<form
+  id="activity-form"
+  class="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 sm:p-6"
+>
+  <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+    Date
+    <input type="date" name="date" required class="form-input" />
+  </label>
+
+  <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+    Transportation method
+    <select name="method" required class="form-input">
+      <option value="">Select a method</option>
+      <option value="walking">Walking</option>
+      <option value="cycling">Cycling</option>
+      <option value="bus">Bus</option>
+      <option value="car">Car</option>
+    </select>
+  </label>
+
+  <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+    Distance
+    <input
+      type="number"
+      name="distance"
+      min="0.001"
+      step="any"
+      required
+      class="form-input"
+    />
+  </label>
+
+  <label class="flex min-w-0 flex-col gap-2 text-sm font-medium text-slate-700">
+    Unit
+    <select name="unit" required class="form-input">
+      <option value="km">km</option>
+      <option value="mi">mi</option>
+    </select>
+  </label>
+
+  <button type="submit" class="submit-button">Save activity</button>
+</form>
