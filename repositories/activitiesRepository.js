@@ -11,6 +11,11 @@ const activitySchema = new mongoose.Schema(
     distance: { type: Number, required: true, min: 0 },
     unit: { type: String, required: true, enum: ["km", "mi"] },
     emissions: { type: Number, required: true, min: 0 },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true },
 );

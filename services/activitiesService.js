@@ -1,5 +1,6 @@
 import { Ok, Err } from "../result.js";
 import * as activitiesRepository from "../repositories/activitiesRepository.js";
+import * as userRepository from "../repositories/userRepository.js";
 import { toActivityDto } from "../dtos/activityDto.js";
 
 const EMISSION_FACTORS = {
@@ -21,6 +22,25 @@ const withEmissions = ({ date, method, distance, unit }) => {
     unit,
     emissions: Number((distanceKm * EMISSION_FACTORS[method]).toFixed(3)),
   };
+};
+
+const isOwnerOrAdmin = async (activity, actorId) => {
+  if (activity.ownerId.toString() === actorId) return true;
+  const account = await userRepository.findById(actorId);
+  return account?.role === "admin";
+};
+
+export const getActivityForEdit = async (id, actor) => {
+  const existing = await activitiesRepository.findById(id);
+  if (!existing)
+    return Err({ status: 404, message: "Activity entry not found" });
+  if (!(await isOwnerOrAdmin(existing, actor.id))) {
+    return Err({
+      status: 403,
+      message: "You do not have permission to modify this Activity entry.",
+    });
+  }
+  return Ok(toActivityDto(existing));
 };
 
 const validDate = (date) => {
@@ -131,14 +151,23 @@ export const createActivity = async (data) => {
   const result = validateActivity(data);
   if (!result.ok) return result;
   const saved = await activitiesRepository.create(withEmissions(result.value));
-  return Ok(toActivityDto(saved));
+  return Ok(toActivityDto({ ...saved, ownerId: actor.id }));
 };
 
-export const updateActivity = async (id, data) => {
+export const updateActivity = async (id, data, actor) => {
   const existing = await activitiesRepository.findById(id);
   if (!existing) return Err({ status: 404, message: "Activity not found." });
+
+  if (!(await isOwnerOrAdmin(existing, actor.id))) {
+    return Err({
+      status: 403,
+      message: "You do not have permission to modify this entry",
+    });
+  }
+
   const result = validateActivity(data);
   if (!result.ok) return result;
+
   const updated = await activitiesRepository.updateById(
     id,
     withEmissions(result.value),
@@ -147,11 +176,18 @@ export const updateActivity = async (id, data) => {
   return Ok(toActivityDto(updated));
 };
 
-export const deleteActivity = async (id) => {
+export const deleteActivity = async (id, actor) => {
   const existing = await activitiesRepository.findById(id);
 
   if (!existing) {
     return Err({ status: 404, message: "Activity not found." });
+  }
+
+  if (!(await isOwnerOrAdmin(existing, actor.id))) {
+    return Err({
+      status: 403,
+      message: "You do not have permission to delete this entry",
+    });
   }
 
   const deleted = await activitiesRepository.removeById(id);
