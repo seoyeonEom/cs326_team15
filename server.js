@@ -23,6 +23,34 @@ const app = express();
 app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
 
+//livereload dev tool
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const filename = fileURLToPath(import.meta.url);
+const dir = path.dirname(filename);
+
+const isProduction = process.env.NODE_ENV === "production";
+
+if (!isProduction) {
+  const livereload = await import("livereload");
+  const connectLReload = await import("connect-livereload");
+
+  const lReloadServer = livereload.default.createServer({
+    host: "0.0.0.0",
+    port: 35729,
+  });
+
+  lReloadServer.watch([path.join(dir, "public"), path.join(dir, "views")]);
+
+  lReloadServer.server.once("connection", () => {
+    setTimeout(() => {
+      lReloadServer.refresh("/");
+    }, 100);
+  });
+
+  app.use(connectLReload.default({ port: 35729 }));
+}
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
