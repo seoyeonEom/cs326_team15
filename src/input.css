@@ -9,6 +9,14 @@
     @apply text-xl font-bold tracking-tight text-emerald-800;
   }
 
+  .header-nav {
+    @apply flex flex-wrap gap-2 text-sm font-medium;
+  }
+
+  .header-nav-link {
+    @apply rounded-lg px-3 py-2 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-all duration-100;
+  }
+
   .header-div {
     @apply mx-auto flex max-w-5xl flex-col gap-4 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6;
   }
@@ -57,7 +65,35 @@
     @apply text-sm font-medium text-slate-700;
   }
 
-  .a {
-    @apply rounded-lg px-3 py-2 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-all duration-100;
+  .breakdown-outer-div {
+    @apply my-5 grid grid-cols-1 gap-3 sm:grid-cols-2;
+  }
+
+  .total-emissions-div {
+    @apply rounded-xl bg-emerald-50 p-4;
+  }
+
+  .total-emissions-p {
+    @apply text-sm font-medium text-emerald-800;
+  }
+
+  .total-emissions-strong {
+    @apply mt-2 block wrap-break-word text-2xl text-emerald-900;
+  }
+
+  .num-activities-div {
+    @apply rounded-xl bg-slate-100 p-4;
+  }
+
+  .num-activities-p {
+    @apply text-sm font-medium text-slate-600;
+  }
+
+  .num-activities-strong {
+    @apply mt-2 block text-2xl text-slate-900;
+  }
+
+  .saved-activities-h3 {
+    @apply mb-3 text-lg font-semibold;
   }
 }
