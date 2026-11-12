@@ -1,32 +1,32 @@
-<div class="my-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-  <div class="rounded-xl bg-emerald-50 p-4">
-    <p class="text-sm font-medium text-emerald-800">
+<div class="breakdown-outer-div">
+  <div class="total-emissions-div">
+    <p class="total-emissions-p">
       Total CO2 emissions
     </p>
 
     <strong
       id="total-emissions"
-      class="mt-2 block break-words text-2xl text-emerald-900"
+      class="total-emissions-strong"
     >
       <%= breakdown.totalEmissions %> kg CO₂
     </strong>
   </div>
 
-  <div class="rounded-xl bg-slate-100 p-4">
-    <p class="text-sm font-medium text-slate-600">
+  <div class="num-activities-div">
+    <p class="num-activities-p">
       Number of activities
     </p>
 
     <strong
       id="activity-count"
-      class="mt-2 block text-2xl text-slate-900"
+      class="num-activities-strong"
     >
       <%= breakdown.activityCount %>
     </strong>
   </div>
 </div>
 
-<h3 class="mb-3 text-lg font-semibold">
+<h3 class="saved-activities-h3">
   Saved Activities
 </h3>
 
@@ -38,7 +38,7 @@
   <ul id="activities" class="space-y-3">
     <% breakdown.activities.forEach((activity) => { %>
       <li class="activity-item flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <span class="min-w-0 break-words text-sm leading-6 text-slate-700">
+        <span class="min-w-0 wrap-break-word text-sm leading-6 text-slate-700">
           <strong class="text-slate-900">
             <%= activity.date %>
           </strong>
