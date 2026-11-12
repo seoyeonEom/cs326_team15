@@ -23,7 +23,7 @@ const app = express();
 app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
 
-//livereload dev tool
+//livereload dev tool - Doesn't reload .css file changes: npm start for css
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const filename = fileURLToPath(import.meta.url);
