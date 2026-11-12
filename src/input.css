@@ -2,7 +2,7 @@
 
 @layer components {
   .header {
-    @apply flex flex-col border-b-2 border-gray-300 pb-1 mb-4 md:flex-row md:justify-between md:items-center;
+    @apply border-b-2 border-gray-300 md:flex-row md:justify-between md:items-center;
   }
 
   .activities-title,
@@ -14,15 +14,15 @@
   }
 
   .header-nav {
-    @apply flex flex-wrap items-center justify-center gap-1.5 text-sm font-medium sm:justify-end;
+    @apply flex flex-wrap gap-2 text-sm font-medium;
   }
 
   .header-nav-link {
-    @apply rounded-lg px-3 text-slate-700 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-800;
+    @apply rounded-lg px-3 py-2 text-slate-700 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-800;
   }
 
   .header-div {
-    @apply mx-auto flex max-w-5xl flex-col gap-2 px-4 pt-1.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-6;
+    @apply mx-auto flex max-w-5xl flex-col gap-4 px-4 py-5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-6;
   }
 
   .activities-main {
