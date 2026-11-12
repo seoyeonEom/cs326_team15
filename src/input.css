@@ -28,7 +28,7 @@
   }
 
   .header-div {
-    @apply flex flex-col gap-4 py-2.5 sm:flex-row sm:items-center sm:justify-between;
+    @apply gap-4 py-2.5 sm:flex-row sm:items-center sm:justify-between;
   }
 
   .activities-main {
