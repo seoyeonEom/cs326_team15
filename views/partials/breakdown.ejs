@@ -31,15 +31,15 @@
 </h3>
 
 <% if (breakdown.activities.length === 0) { %>
-  <p class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-600">
+  <p class="no-activities-p">
     No activities to show.
   </p>
 <% } else { %>
-  <ul id="activities" class="space-y-3">
+  <ul id="activities" class="breakdown-ul">
     <% breakdown.activities.forEach((activity) => { %>
-      <li class="activity-item flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <span class="min-w-0 wrap-break-word text-sm leading-6 text-slate-700">
-          <strong class="text-slate-900">
+      <li class="breakdown-li">
+        <span class="breakdown-span">
+          <strong class="">
             <%= activity.date %>
           </strong>
           — <%= activity.method %>,
@@ -49,7 +49,7 @@
 
         <button
           type="button"
-          class="delete-button min-h-11 shrink-0 cursor-pointer rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+          class="breakdown-delete-button"
           hx-delete="/activities/<%= activity.id %>"
           hx-target="closest li"
           hx-swap="outerHTML"
