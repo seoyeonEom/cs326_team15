@@ -170,6 +170,17 @@ Restyled `/activities` and `/goals` with Tailwind utility classes for forms, nav
 
 **How to see it:** Run `npm install` and `npm start`, which automatically builds `src/input.css` into `public/style.css`. Visit `/activities` and `/goals` at 375px and 1280px widths to check the layout. Activity filtering and deletion continue to use HTMX.
 
+## Sprint 4 Features
+
+### Accessibility Audit
+
+| Area                | Findings and Verification                                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keyboard navigation | All tested controls were accessible using Tab, Shift+Tab, and Enter, with visible focus indicators.                                                                                          |
+| HTMX focus          | Deleting an activity caused keyboard focus to be lost. Fixed in `public/app.js` by returning focus to `#method-filter` after successful deletion. Verified through keyboard-only testing.    |
+| Form labels         | Verified in DevTools that all form controls have associated labels (Activities: 5/5; Goals: 3/3).                                                                                            |
+| Color contrast      | Checked body text and primary buttons in normal and hover states. Calculated contrast ratios ranged from approximately 5.5:1 to 17.9:1, meeting the 4.5:1 requirement for the tested colors. |
+
 ## System Diagram
 
 ![Sprint 3 System Architecture](docs/sprint3_diagram.svg)
