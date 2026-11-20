@@ -10,6 +10,16 @@
       <a href="/activities" class="header-nav-link"> Activities </a>
 
       <a href="/goals" class="header-nav-link"> Goals </a>
+      <% if (typeof user !== "undefined" && user) { %>
+        <form action="/logout" method="POST">
+          <button type="submit" class="header-nav-link">
+            Log out
+          </button>
+        </form>
+      <% } else { %>
+        <a href="/login" class="header-nav-link">Log in</a>
+        <a href="/signup" class="header-nav-link">Sign up</a>
+      <% } %>
     </nav>
   </div>
 </header>
