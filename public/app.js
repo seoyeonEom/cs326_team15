@@ -1,4 +1,4 @@
-const form = document.querySelector("#activity-form");
+const activityForm = document.querySelector("#activity-form");
 const message = document.querySelector("#message");
 
 const timedFetch = (url, options = {}) =>
@@ -33,12 +33,12 @@ const fetchJSON = async (url, options = {}) => {
 const announceActivitiesChanged = () =>
   document.body.dispatchEvent(new Event("activities-changed"));
 
-if (form && message) {
-  form.addEventListener("submit", async (event) => {
+if (activityForm && message) {
+  activityForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const activity = Object.fromEntries(new FormData(form));
-    const button = form.querySelector('button[type="submit"]');
+    const activity = Object.fromEntries(new FormData(activityForm));
+    const button = activityForm.querySelector('button[type="submit"]');
 
     button.disabled = true;
     message.textContent = "";
@@ -50,7 +50,7 @@ if (form && message) {
         body: JSON.stringify(activity),
       });
 
-      form.reset();
+      activityForm.reset();
       message.textContent = "Activity saved successfully.";
       announceActivitiesChanged();
     } catch (error) {
