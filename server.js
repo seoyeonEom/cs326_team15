@@ -3,6 +3,16 @@ import activitiesRouter from "./routes/activities.js";
 import goalsRouter from "./routes/goals.js";
 import mongoose from "mongoose";
 import activityRecordsRouter from "./routes/activityRecords.js";
+import cookieParser from "cookie-parser";
+import { attachUser } from "./middleware/attachUser.js";
+import authRouter from "./routes/auth.js";
+
+const app = express();
+app.disable("x-powered-by");
+const PORT = process.env.PORT || 3000;
+
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || "dev-secret-change-in-production";
 
 const MONGODB_URI =
   process.env.MONGODB_URI ||
@@ -19,10 +29,6 @@ try {
   process.exit(1);
 }
 
-const app = express();
-app.disable("x-powered-by");
-const PORT = process.env.PORT || 3000;
-
 //livereload dev tool - Doesn't reload .css file changes: npm start for css
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -37,7 +43,7 @@ if (!isProduction) {
 
   const lReloadServer = livereload.default.createServer({
     host: "0.0.0.0",
-    port: 35729,
+    port: 35730,
   });
 
   lReloadServer.watch([path.join(dir, "public"), path.join(dir, "views")]);
@@ -48,7 +54,7 @@ if (!isProduction) {
     }, 100);
   });
 
-  app.use(connectLReload.default({ port: 35729 }));
+  app.use(connectLReload.default({ port: 35730 }));
 }
 
 app.set("view engine", "ejs");
@@ -73,6 +79,10 @@ app.get("/dashboard", (req, res) => {
   `);
 });
 
+app.use(cookieParser(SESSION_SECRET));
+app.use(attachUser);
+
+app.use(authRouter);
 app.use("/activities", activitiesRouter);
 app.use("/activities", activityRecordsRouter);
 app.use("/goals", goalsRouter);
