@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="650" viewBox="0 0 1440 650" role="img" aria-labelledby="svgTitle svgDesc">
+<title id="svgTitle">System architecture with session authentication and authorization</title>
+<desc id="svgDesc">The main request path runs from browser and EJS views through routes, controllers, services, repositories and MongoDB. Protected routes use requireLogin. Services enforce activity ownership or admin rights and assign goal ownerId. The browser stores a signed HttpOnly sessionId cookie. attachUser looks up the session in a server-memory Map and sets req.user. Jest tests use mocked repositories. DTOs map database identifiers to client-facing ids.</desc>
+<defs>
+ <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 9 4.5 L 0 9 z" fill="#9CACBE"/></marker>
+ <marker id="arrow-violet" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 9 4.5 L 0 9 z" fill="#8167B6"/></marker>
+ <marker id="arrow-teal" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 9 4.5 L 0 9 z" fill="#3A8F80"/></marker>
+</defs>
+<rect x="0" y="0" width="1440" height="650" fill="#F7FAFD"/>
+
+<rect x="46" y="37" width="178" height="162" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="135.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">Browser / Views</text>
+<text x="135.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">EJS templates</text>
+<text x="135.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">HTMX / public assets</text>
+<text x="135.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">signed session cookie</text>
+<rect x="280" y="37" width="178" height="162" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="369.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">Routes</text>
+<text x="369.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Auth / Activities</text>
+<text x="369.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Goals + /health (public)</text>
+<text x="369.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">requireLogin (protected)</text>
+<rect x="514" y="37" width="178" height="162" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="603.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">Controllers</text>
+<text x="603.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Auth / Activities</text>
+<text x="603.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Activity Records / Goals</text>
+<text x="603.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">pass req.user</text>
+<rect x="748" y="37" width="178" height="162" rx="12" fill="#F4F8FF" stroke="#8BB2DD" stroke-width="1.5"/>
+<text x="837.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#1F527E" text-anchor="middle">Services</text>
+<text x="837.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">bcrypt + validation</text>
+<text x="837.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">owner / admin checks</text>
+<text x="837.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">set goal ownerId</text>
+<rect x="982" y="37" width="178" height="162" rx="12" fill="#F0FAF6" stroke="#60B9A0" stroke-width="1.5"/>
+<text x="1071.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#126A56" text-anchor="middle">Repositories</text>
+<text x="1071.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">User model / repo</text>
+<text x="1071.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Activities / Goals</text>
+<text x="1071.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">Mongoose CRUD</text>
+<rect x="1216" y="37" width="178" height="162" rx="12" fill="#F0FAF6" stroke="#60B9A0" stroke-width="1.5"/>
+<text x="1305.0" y="68" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#126A56" text-anchor="middle">MongoDB</text>
+<text x="1305.0" y="99" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">devdb</text>
+<text x="1305.0" y="121" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">users / activities</text>
+<text x="1305.0" y="143" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">goals collections</text>
+<path d="M 224 118 H 273" fill="none" stroke="#9CACBE" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M 458 118 H 507" fill="none" stroke="#9CACBE" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M 692 118 H 741" fill="none" stroke="#9CACBE" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M 926 118 H 975" fill="none" stroke="#9CACBE" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M 1160 118 H 1209" fill="none" stroke="#9CACBE" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M 837 199 V 222" fill="none" stroke="#8167B6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 5" marker-end="url(#arrow-violet)"/>
+<rect x="771" y="227" width="132" height="50" rx="9" fill="#EDF7F5" stroke="#73B8A6" stroke-width="1.5"/>
+<text x="837" y="246" font-size="14" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#176B5B" text-anchor="middle">DTOs</text>
+<text x="837" y="263" font-size="12" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#568577" text-anchor="middle">_id → id</text>
+<rect x="46" y="329" width="233" height="110" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="162.5" y="360" font-size="17" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">Signed cookie</text>
+<text x="162.5" y="391" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">sessionId · HttpOnly</text>
+<text x="162.5" y="412" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">browser sends each request</text>
+<rect x="325" y="329" width="233" height="110" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="441.5" y="360" font-size="17" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">attachUser</text>
+<text x="441.5" y="391" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">reads signed cookie</text>
+<text x="441.5" y="412" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">sets req.user if valid</text>
+<rect x="604" y="329" width="233" height="110" rx="12" fill="#F4F8FF" stroke="#8BB2DD" stroke-width="1.5"/>
+<text x="720.5" y="360" font-size="17" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#1F527E" text-anchor="middle">sessions.js</text>
+<text x="720.5" y="391" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">in-memory Map</text>
+<text x="720.5" y="412" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">sessionId → userId</text>
+<rect x="883" y="329" width="233" height="110" rx="12" fill="#FFFFFF" stroke="#C9D7E6" stroke-width="1.5"/>
+<text x="999.5" y="360" font-size="17" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#23435F" text-anchor="middle">requireLogin</text>
+<text x="999.5" y="391" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">protected routes</text>
+<text x="999.5" y="412" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">401 when logged out</text>
+<rect x="1162" y="329" width="232" height="110" rx="12" fill="#F0FAF6" stroke="#60B9A0" stroke-width="1.5"/>
+<text x="1278.0" y="360" font-size="17" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#126A56" text-anchor="middle">Service permissions</text>
+<text x="1278.0" y="391" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">owner / admin check</text>
+<text x="1278.0" y="412" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">403 for non-owners</text>
+<path d="M 279 384 H 318" fill="none" stroke="#3A8F80" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+<path d="M 558 384 H 597" fill="none" stroke="#3A8F80" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+<path d="M 837 384 H 876" fill="none" stroke="#3A8F80" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+<path d="M 1116 384 H 1155" fill="none" stroke="#3A8F80" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+<path d="M 603 199 V 292 H 720 V 320" fill="none" stroke="#8167B6" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 5" marker-end="url(#arrow-violet)"/>
+<text x="635" y="309" font-size="11" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#7256A5" text-anchor="end">create / destroy</text>
+<rect x="603" y="498" width="305" height="105" rx="12" fill="#FAF7FF" stroke="#B8A2DF" stroke-width="1.5"/>
+<text x="755.5" y="529" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#5F438D" text-anchor="middle">Jest Tests</text>
+<text x="755.5" y="560" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">activitiesService.test.js</text>
+<text x="755.5" y="581" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">goalsService.test.js</text>
+<rect x="964" y="498" width="330" height="105" rx="12" fill="#FAF7FF" stroke="#B8A2DF" stroke-width="1.5"/>
+<text x="1129.0" y="529" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#5F438D" text-anchor="middle">Mocked Repositories</text>
+<text x="1129.0" y="560" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">jest.unstable_mockModule()</text>
+<text x="1129.0" y="581" font-size="13" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#5B7084" text-anchor="middle">no MongoDB required</text>
+<path d="M 908 549 H 957" fill="none" stroke="#8167B6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 5" marker-end="url(#arrow-violet)"/>
+</svg>

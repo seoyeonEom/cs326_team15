@@ -11,12 +11,12 @@ const app = express();
 app.disable("x-powered-by");
 const PORT = process.env.PORT || 3000;
 
-const SESSION_SECRET =
-  process.env.SESSION_SECRET || "dev-secret-change-in-production";
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin";
+if (!SESSION_SECRET || !MONGODB_URI) {
+  throw new Error("Missing required environment variables.");
+}
 
 try {
   await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
@@ -66,17 +66,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Home Page
 app.get("/", (req, res) => {
-  res.send("Welcome to our Carbon Footprint Tracker!");
+  res.render("home", { title: "Home" });
 });
 
-// Domain-Specific Page
+// Redirect Dashboard to Home
 app.get("/dashboard", (req, res) => {
-  res.send(`
-    <h1>Carbon Footprint Dashboard</h1>
-    <p>Track your daily carbon footprint and monitor your environmental impact<p>
-    <p>View your carbon intensity, daily goals, and progress over time</p>
-    <p><a href="/activities">Transportation Activities</a></p>
-  `);
+  res.redirect("/");
 });
 
 app.use(cookieParser(SESSION_SECRET));

@@ -22,24 +22,34 @@ const goalsRepo = await import("../repositories/goalsRepository.js");
 const activitiesRepo = await import("../repositories/activitiesRepository.js");
 const service = await import("../services/goalsService.js");
 
-const valid = { week: "2026-10-21", method: "cycling", targetDays: 3 };
+const actor = { id: "user-1" };
+const valid = {
+  week: "2026-10-21",
+  method: "cycling",
+  targetDays: 3,
+};
 const stored = {
   _id: "g1",
   weekStart: "2026-10-19",
   method: "cycling",
   targetDays: 3,
+  ownerId: actor.id,
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
   goalsRepo.getAll.mockResolvedValue([]);
   goalsRepo.findById.mockResolvedValue(null);
-  goalsRepo.create.mockImplementation(async (data) => ({ _id: "g1", ...data }));
+
+  goalsRepo.create.mockImplementation(async (data) => ({
+    _id: "g1",
+    ...data,
+  }));
   activitiesRepo.getAll.mockResolvedValue([]);
 });
 
 test("createGoal rejects a non-object payload", async () => {
-  const result = await service.createGoal(null);
+  const result = await service.createGoal(null, actor);
   expect(result.error.status).toBe(400);
   expect(goalsRepo.create).not.toHaveBeenCalled();
 });
@@ -49,7 +59,7 @@ test.each(["week", "method", "targetDays"])(
   async (field) => {
     const input = { ...valid };
     delete input[field];
-    const result = await service.createGoal(input);
+    const result = await service.createGoal(input, actor);
     expect(result.error.status).toBe(400);
     expect(goalsRepo.create).not.toHaveBeenCalled();
   },
@@ -58,13 +68,20 @@ test.each(["week", "method", "targetDays"])(
 test.each(["2026-02-30", "not-a-date"])(
   "createGoal rejects invalid date %s",
   async (week) => {
-    const result = await service.createGoal({ ...valid, week });
+    const result = await service.createGoal(
+      { ...valid, week },
+      actor,
+    );
     expect(result.error.message).toMatch(/valid date/);
+    expect(goalsRepo.create).not.toHaveBeenCalled();
   },
 );
 
 test("createGoal rejects an unsupported method", async () => {
-  const result = await service.createGoal({ ...valid, method: "airplane" });
+  const result = await service.createGoal(
+    { ...valid, method: "airplane" },
+    actor,
+  );
   expect(result.error.status).toBe(400);
   expect(goalsRepo.create).not.toHaveBeenCalled();
 });
@@ -72,25 +89,31 @@ test("createGoal rejects an unsupported method", async () => {
 test.each([0, 8, 2.5, "foo", " ", true])(
   "createGoal rejects invalid targetDays %s",
   async (targetDays) => {
-    const result = await service.createGoal({ ...valid, targetDays });
+    const result = await service.createGoal(
+      { ...valid, targetDays },
+      actor,
+    );
     expect(result.error.status).toBe(400);
     expect(goalsRepo.create).not.toHaveBeenCalled();
   },
 );
-
 test("createGoal rejects an existing method/week combination", async () => {
   goalsRepo.getAll.mockResolvedValue([stored]);
-  const result = await service.createGoal(valid);
+  const result = await service.createGoal(valid, actor);
   expect(result.error.status).toBe(409);
   expect(goalsRepo.create).not.toHaveBeenCalled();
 });
 
 test("createGoal converts a selected Wednesday to Monday and creates one record", async () => {
-  const result = await service.createGoal({ ...valid, targetDays: "3" });
+  const result = await service.createGoal(
+    { ...valid, targetDays: "3" },
+    actor,
+  );
   expect(goalsRepo.create).toHaveBeenCalledWith({
     weekStart: "2026-10-19",
     method: "cycling",
     targetDays: 3,
+    ownerId: actor.id,
   });
   expect(result).toEqual({
     ok: true,
@@ -115,19 +138,21 @@ test("createGoal counts only distinct days in its week and matching method", asy
     { date: "2026-10-22", method: "car" },
     { date: "2026-10-26", method: "cycling" },
   ]);
-  const result = await service.createGoal(valid);
+  const result = await service.createGoal(valid, actor);
   expect(result.value.completedDays).toBe(3);
   expect(result.value.achieved).toBe(true);
 });
-
 test("createGoal rethrows database errors that are not duplicate keys", async () => {
-  goalsRepo.create.mockRejectedValue(new Error("connection lost"));
-  await expect(service.createGoal(valid)).rejects.toThrow("connection lost");
+  goalsRepo.create.mockRejectedValue(
+    new Error("connection lost"),
+  );
+  await expect(
+    service.createGoal(valid, actor),
+  ).rejects.toThrow("connection lost");
 });
-
 test("createGoal maps a database duplicate-key error to 409", async () => {
   goalsRepo.create.mockRejectedValue({ code: 11000 });
-  const result = await service.createGoal(valid);
+  const result = await service.createGoal(valid, actor);
   expect(result.error.status).toBe(409);
 });
 
@@ -163,4 +188,32 @@ test("listGoals shows saved goals with progress", async () => {
   expect(result).toHaveLength(1);
   expect(result[0].completedDays).toBe(1);
   expect(result[0].id).toBe("g1");
+});
+
+test("createGoal rejects unauthenticated users", async () => {
+  const result = await service.createGoal(valid);
+
+  expect(result).toEqual({
+    ok: false,
+    error: {
+      status: 401,
+      message: "Login required.",
+    },
+  });
+
+  expect(goalsRepo.create).not.toHaveBeenCalled();
+});
+
+test("createGoal saves the logged-in user as owner", async () => {
+  const result = await service.createGoal(valid, actor);
+
+  expect(result.ok).toBe(true);
+
+  expect(goalsRepo.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      ownerId: actor.id,
+    }),
+  );
+
+  expect(goalsRepo.create).toHaveBeenCalledTimes(1);
 });
