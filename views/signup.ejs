@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Carbon Footprint Tracker</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+
+  <body class="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <%- include('partials/header') %>
+
+    <main class="mx-auto max-w-md px-4 py-12">
+      <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="mb-2 text-2xl font-bold">Create an account</h2>
+        <p class="mb-6 text-sm text-slate-600">
+          Sign up to start tracking your carbon footprint.
+        </p>
+
+        <% if (error) { %>
+          <p role="alert" class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <%= error %>
+          </p>
+        <% } %>
+
+        <form action="/signup" method="POST" class="space-y-4">
+          <div>
+            <label for="email" class="mb-1 block text-sm font-medium">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value="<%= email %>"
+              autocomplete="email"
+              required
+              class="form-input w-full"
+            >
+          </div>
+
+          <div>
+            <label for="password" class="mb-1 block text-sm font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              class="form-input w-full"
+            >
+          </div>
+
+          <button type="submit" class="submit-button w-full">
+            Create account
+          </button>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-slate-600">
+          Already have an account?
+          <a href="/login" class="font-semibold text-emerald-700 underline">
+            Log in
+          </a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

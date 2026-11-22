@@ -6,5 +6,6 @@ export const attachUser = (req, res, next) => {
   if (session) {
     req.user = { id: session.userId };
   }
+  res.locals.user = req.user ?? null;
   next();
 };
