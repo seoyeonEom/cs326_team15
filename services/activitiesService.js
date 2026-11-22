@@ -25,6 +25,7 @@ const withEmissions = ({ date, method, distance, unit }) => {
 };
 
 const isOwnerOrAdmin = async (activity, actorId) => {
+  if (!actorId) return false;
   if (activity.ownerId.toString() === actorId) return true;
   const account = await userRepository.findById(actorId);
   return account?.role === "admin";
@@ -147,16 +148,26 @@ export const getActivity = async (id) => {
   return Ok(toActivityDto(activity));
 };
 
-export const createActivity = async (data) => {
+export const createActivity = async (data, actor) => {
   const result = validateActivity(data);
   if (!result.ok) return result;
-  const saved = await activitiesRepository.create(withEmissions(result.value));
-  return Ok(toActivityDto({ ...saved, ownerId: actor.id }));
+  if (!actor?.id) {
+    return Err({ status: 401, message: "Login required." });
+  }
+  const saved = await activitiesRepository.create({
+    ...withEmissions(result.value),
+    ownerId: actor.id,
+  });
+  return Ok(toActivityDto(saved));
 };
 
 export const updateActivity = async (id, data, actor) => {
   const existing = await activitiesRepository.findById(id);
   if (!existing) return Err({ status: 404, message: "Activity not found." });
+
+  if (!actor?.id) {
+    return Err({ status: 401, message: "Login required." });
+  }
 
   if (!(await isOwnerOrAdmin(existing, actor.id))) {
     return Err({
@@ -181,6 +192,10 @@ export const deleteActivity = async (id, actor) => {
 
   if (!existing) {
     return Err({ status: 404, message: "Activity not found." });
+  }
+
+  if (!actor?.id) {
+    return Err({ status: 401, message: "Login required." });
   }
 
   if (!(await isOwnerOrAdmin(existing, actor.id))) {

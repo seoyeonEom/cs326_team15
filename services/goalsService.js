@@ -112,9 +112,13 @@ export const getGoal = async (id) => {
   return Ok(withProgress(goal, activities));
 };
 
-export const createGoal = async (data) => {
+export const createGoal = async (data, actor) => {
   const result = validateGoal(data);
   if (!result.ok) return result;
+
+  if (!actor?.id) {
+    return Err({ status: 401, message: "Login required." });
+  }
 
   const { weekStart, method, targetDays } = result.value;
   const goals = await goalsRepository.getAll();
@@ -136,6 +140,7 @@ export const createGoal = async (data) => {
       weekStart,
       method,
       targetDays,
+      ownerId: actor.id,
     });
   } catch (error) {
     if (error?.code === 11000) {

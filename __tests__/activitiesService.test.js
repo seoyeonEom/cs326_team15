@@ -9,8 +9,17 @@ jest.unstable_mockModule("../repositories/activitiesRepository.js", () => ({
   removeById: jest.fn(),
 }));
 
+jest.unstable_mockModule("../repositories/userRepository.js", () => ({
+  findById: jest.fn(),
+}));
+
 const repo = await import("../repositories/activitiesRepository.js");
+const userRepo = await import("../repositories/userRepository.js");
 const service = await import("../services/activitiesService.js");
+
+const owner = { id: "user-1" };
+const otherUser = { id: "user-2" };
+const admin = { id: "admin-1" };
 
 const valid = {
   date: "2026-10-19",
@@ -32,6 +41,10 @@ beforeEach(() => {
     ...data,
   }));
   repo.removeById.mockResolvedValue({ _id: "activity-1" });
+  userRepo.findById.mockResolvedValue({
+    _id: otherUser.id,
+    role: "member",
+  });
 });
 
 test("createActivity rejects a non-object payload", async () => {
@@ -85,17 +98,21 @@ test.each([0, -5, "abc", " ", Infinity, true])(
 );
 
 test("createActivity computes emissions and calls per-record create", async () => {
-  const result = await service.createActivity({
-    ...valid,
-    method: "bus",
-    distance: "5",
-  });
+  const result = await service.createActivity(
+    {
+      ...valid,
+      method: "bus",
+      distance: "5",
+    },
+    owner,
+  );
   expect(repo.create).toHaveBeenCalledWith({
     date: "2026-10-19",
     method: "bus",
     distance: 5,
     unit: "km",
     emissions: 0.5,
+    ownerId: owner.id,
   });
   expect(result).toEqual({
     ok: true,
@@ -111,15 +128,18 @@ test("createActivity computes emissions and calls per-record create", async () =
 });
 
 test("createActivity converts miles to kilometers for emissions", async () => {
-  const result = await service.createActivity({
-    ...valid,
-    method: "car",
-    distance: 1,
-    unit: "mi",
-  });
+  const result = await service.createActivity(
+    {
+      ...valid,
+      method: "car",
+      distance: 1,
+      unit: "mi",
+    },
+    owner,
+  );
   expect(result.value.emissions).toBe(0.322);
   expect(repo.create).toHaveBeenCalledWith(
-    expect.objectContaining({ emissions: 0.322 }),
+    expect.objectContaining({ emissions: 0.322, ownerId: owner.id }),
   );
 });
 
@@ -144,24 +164,42 @@ test("getActivity returns one record when found", async () => {
 });
 
 test("updateActivity rejects an id not found", async () => {
-  const result = await service.updateActivity("missing", valid);
+  const result = await service.updateActivity("missing", valid, owner);
   expect(result.error.status).toBe(404);
   expect(repo.updateById).not.toHaveBeenCalled();
 });
 
 test("updateActivity validates data before modifying existing record", async () => {
-  repo.findById.mockResolvedValue({ _id: "a1", ...valid, emissions: 0 });
-  const result = await service.updateActivity("a1", { ...valid, distance: -1 });
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    emissions: 0,
+    ownerId: owner.id,
+  });
+  const result = await service.updateActivity(
+    "a1",
+    { ...valid, distance: -1 },
+    owner,
+  );
   expect(result.error.status).toBe(400);
   expect(repo.updateById).not.toHaveBeenCalled();
 });
 
 test("updateActivity recomputes emissions and uses updateById", async () => {
-  repo.findById.mockResolvedValue({ _id: "a1", ...valid, emissions: 0 });
-  const result = await service.updateActivity("a1", {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
     ...valid,
-    method: "car",
+    emissions: 0,
+    ownerId: owner.id,
   });
+  const result = await service.updateActivity(
+    "a1",
+    {
+      ...valid,
+      method: "car",
+    },
+    owner,
+  );
   expect(repo.updateById).toHaveBeenCalledWith("a1", {
     ...valid,
     method: "car",
@@ -171,21 +209,21 @@ test("updateActivity recomputes emissions and uses updateById", async () => {
 });
 
 test("updateActivity returns 404 if a record disappears before update", async () => {
-  repo.findById.mockResolvedValue({ _id: "a1", ...valid });
+  repo.findById.mockResolvedValue({ _id: "a1", ...valid, ownerId: owner.id });
   repo.updateById.mockResolvedValue(null);
-  const result = await service.updateActivity("a1", valid);
+  const result = await service.updateActivity("a1", valid, owner);
   expect(result.error.status).toBe(404);
 });
 
 test("deleteActivity rejects an id not found", async () => {
-  const result = await service.deleteActivity("missing");
+  const result = await service.deleteActivity("missing", owner);
   expect(result.error.status).toBe(404);
   expect(repo.removeById).not.toHaveBeenCalled();
 });
 
 test("deleteActivity calls removeById for a real record", async () => {
-  repo.findById.mockResolvedValue({ _id: "a1", ...valid });
-  const result = await service.deleteActivity("a1");
+  repo.findById.mockResolvedValue({ _id: "a1", ...valid, ownerId: owner.id });
+  const result = await service.deleteActivity("a1", owner);
   expect(result).toEqual({ ok: true, value: null });
   expect(repo.removeById).toHaveBeenCalledWith("a1");
   expect(repo.removeById).toHaveBeenCalledTimes(1);
@@ -196,11 +234,12 @@ test("deleteActivity returns 404 if the record disappears during deletion", asyn
     _id: "a1",
     ...valid,
     emissions: 0,
+    ownerId: owner.id,
   });
 
   repo.removeById.mockResolvedValue(null);
 
-  const result = await service.deleteActivity("a1");
+  const result = await service.deleteActivity("a1", owner);
 
   expect(result).toEqual({
     ok: false,
@@ -216,7 +255,7 @@ test("deleteActivity returns 404 if the record disappears during deletion", asyn
 test("deleteActivity does not attempt deletion if the record does not exist", async () => {
   repo.findById.mockResolvedValue(null);
 
-  const result = await service.deleteActivity("missing");
+  const result = await service.deleteActivity("missing", owner);
 
   expect(result.ok).toBe(false);
   expect(result.error.status).toBe(404);
@@ -274,4 +313,69 @@ test("getEmissionsBreakdown returns zeros when nothing matches", async () => {
     totalEmissions: 0,
     activityCount: 0,
   });
+});
+
+test("non-owner cannot update another user's activity", async () => {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    ownerId: owner.id,
+  });
+
+  const result = await service.updateActivity("a1", valid, otherUser);
+
+  expect(result.ok).toBe(false);
+  expect(result.error.status).toBe(403);
+  expect(repo.updateById).not.toHaveBeenCalled();
+});
+
+test("non-owner cannot delete another user's activity", async () => {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    ownerId: owner.id,
+  });
+
+  const result = await service.deleteActivity("a1", otherUser);
+
+  expect(result.ok).toBe(false);
+  expect(result.error.status).toBe(403);
+  expect(repo.removeById).not.toHaveBeenCalled();
+});
+
+test("owner can update their own activity", async () => {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    ownerId: owner.id,
+  });
+
+  const result = await service.updateActivity("a1", valid, owner);
+
+  expect(result.ok).toBe(true);
+  expect(repo.updateById).toHaveBeenCalledWith(
+    "a1",
+    expect.objectContaining({
+      date: valid.date,
+      method: valid.method,
+    }),
+  );
+});
+
+test("admin can delete another user's activity", async () => {
+  repo.findById.mockResolvedValue({
+    _id: "a1",
+    ...valid,
+    ownerId: owner.id,
+  });
+
+  userRepo.findById.mockResolvedValue({
+    _id: admin.id,
+    role: "admin",
+  });
+
+  const result = await service.deleteActivity("a1", admin);
+
+  expect(result.ok).toBe(true);
+  expect(repo.removeById).toHaveBeenCalledWith("a1");
 });
