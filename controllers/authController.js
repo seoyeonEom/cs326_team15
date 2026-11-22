@@ -1,6 +1,7 @@
 import { toUserDto } from "../dtos/userDto.js";
 import * as authService from "../services/authService.js";
 import { createSession, destroySession } from "../sessions.js";
+import * as userRepository from "../repositories/userRepository.js";
 
 const fromForm = (req) => Boolean(req.is("application/x-www-form-urlencoded"));
 

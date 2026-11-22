@@ -27,7 +27,7 @@ export const show = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  const result = await goalsService.createGoal(req.body);
+  const result = await goalsService.createGoal(req.body, req.user);
   if (!result.ok) {
     res.status(result.error.status).json({ error: result.error.message });
     return;
