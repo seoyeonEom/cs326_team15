@@ -17,6 +17,11 @@ const goalSchema = new mongoose.Schema(
       min: 1,
       max: 7,
     },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true },
 );

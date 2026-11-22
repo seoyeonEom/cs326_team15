@@ -1,6 +1,18 @@
+import { isValidId } from "../repositories/activitiesRepository.js";
 import * as activitiesService from "../services/activitiesService.js";
 
-const isHtmx = (req) => req.get("HX-Request") === "true";
+const fromHtmx = (req) => req.get("HX-Request") === "true";
+
+const sendError = (req, res, { status, message }) => {
+  if (fromHtmx(req)) {
+    res.status(status).send(message);
+    return;
+  }
+  res.status(status).json({ error: message });
+};
+
+const badId = (req, res) =>
+  sendError(req, res, { status: 400, message: "id must be a valid id" });
 
 export const index = async (req, res) => {
   const result = await activitiesService.getEmissionsBreakdown();
@@ -21,11 +33,19 @@ export const list = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  const result = await activitiesService.createActivity(req.body);
+  const result = await activitiesService.createActivity(req.body, req.user);
   if (!result.ok) {
-    res.status(result.error.status).json({ error: result.error.message });
+    return res
+      .status(result.error.status)
+      .json({ error: result.error.message });
+  }
+  if (fromHtmx(req)) {
+    res
+      .status(201)
+      .render("partials/activity-created", { entry: result.value });
     return;
   }
+
   res.status(201).json(result.value);
 };
 
@@ -38,7 +58,7 @@ export const breakdown = async (req, res) => {
     res.status(result.error.status).json({ error: result.error.message });
     return;
   }
-  if (isHtmx(req)) {
+  if (fromHtmx(req)) {
     res.status(200).render("partials/breakdown", { breakdown: result.value });
     return;
   }

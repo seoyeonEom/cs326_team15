@@ -16,7 +16,7 @@ export const show = async (req, res) => {
 export const update = async (req, res) => {
   const { id } = req.params;
   if (!isValidId(id)) return badId(res);
-  const result = await activitiesService.updateActivity(id, req.body);
+  const result = await activitiesService.updateActivity(id, req.body, req.user);
   if (!result.ok) return sendError(res, result);
   return res.status(200).json(result.value);
 };
@@ -24,7 +24,7 @@ export const update = async (req, res) => {
 export const destroy = async (req, res) => {
   const { id } = req.params;
   if (!isValidId(id)) return badId(res);
-  const result = await activitiesService.deleteActivity(id);
+  const result = await activitiesService.deleteActivity(id, req.user);
   if (!result.ok) return sendError(res, result);
   // Unit 14: an HTMX outerHTML deletion needs an empty HTTP 200, not 204.
   // HX-Trigger tells the breakdown to re-fetch so the totals stay correct.
