@@ -13,3 +13,7 @@ I only used AI for correcting the errors I was stuck on. I didn't use it to dire
 ## Sprint 3
 
 I used AI to help me identify an activity deletion edge case and develop JEST regression tests. I reviewed and implemented a few of the the suggested changes and verified that all tests passed.
+
+## Sprint 4
+
+I used no AI.
