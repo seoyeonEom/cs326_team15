@@ -138,6 +138,7 @@ if (message) {
       event.detail.requestConfig.verb === "delete"
     ) {
       message.textContent = "Activity deleted.";
+      methodFilter?.focus();
     }
   });
 

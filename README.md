@@ -25,7 +25,7 @@ Our project is a gamified carbon footprint tracker that helps university student
 
 Follow these steps to run the application locally.
 
-**Prerequisites:** **Node.js** and **npm**. If needed, install the LTS version from [nodejs.org](https://nodejs.org/).
+**Prerequisites:** Node.js and npm. If needed, install the LTS version from [nodejs.org](https://nodejs.org/).
 
 1. Clone the repository
 
@@ -40,25 +40,46 @@ Follow these steps to run the application locally.
    npm install
    ```
 
-3. Start MongoDB from the dev container
+3. Configure environment variables
+
+   Copy the example environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Generate a random session secret:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+
+   Open `.env` and replace `SESSION_SECRET` with the generated value.
+   The example `MONGODB_URI` is configured for the Gantry development environment. If you are using a different MongoDB instance, update the connection string accordingly.
+   The `.env` file is excluded from Git and must be created locally before starting the server.
+
+4. Start MongoDB from the dev container
 
    ```bash
    dc-up mongo
    ```
 
-   The server connects to `mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin` by default. To use a different MongoDB (for example a local install at `mongodb://localhost:27017/devdb`), set `MONGODB_URI` before starting the server. If MongoDB is not reachable, the server exits after five seconds with a message saying so.
+   If MongoDB is not reachable, the server exits after five seconds with an error message.
 
-4. Start the Express server from the project root
+5. Start the Express server from the project root
 
    ```bash
    npm start
    ```
 
-5. Access the application
-   - **Home page:** [http://localhost:3000](http://localhost:3000)
-   - **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-   - **Transportation Activities:** [http://localhost:3000/activities](http://localhost:3000/activities)
-   - **Weekly Goals:** [http://localhost:3000/goals](http://localhost:3000/goals)
+6. Access the application
+   - **Home page:** http://localhost:3000
+   - **Dashboard:** http://localhost:3000/dashboard
+   - **Transportation Activities:** http://localhost:3000/activities
+   - **Weekly Goals:** http://localhost:3000/goals
+   - **Sign up:** http://localhost:3000/signup
+   - **Log in:** http://localhost:3000/login
+   - **Health check:** http://localhost:3000/health
 
 ## Sprint 2 Features
 
@@ -170,9 +191,50 @@ Restyled `/activities` and `/goals` with Tailwind utility classes for forms, nav
 
 **How to see it:** Run `npm install` and `npm start`, which automatically builds `src/input.css` into `public/style.css`. Visit `/activities` and `/goals` at 375px and 1280px widths to check the layout. Activity filtering and deletion continue to use HTMX.
 
+## Sprint 4 Features
+
+### 1. Authentication and Session Management
+
+Added signup, login, and logout using bcrypt password hashing and signed HTTP-only cookies. Session IDs are stored in browser cookies, while session data is managed in an in-memory Map (`sessions.js`). The `attachUser` middleware identifies logged-in users through their session IDs. We chose this simple session-based approach for our Express and EJS application without requiring client-side JWT management. The cookie signing secret is configured through `SESSION_SECRET`.
+
+**How to use:** Visit `/signup` to create an account with a password of at least 8 characters, log in through `/login`, and use **Log out** to end the session. The `/me` endpoint returns the logged-in user's information or HTTP 401 if unauthenticated.
+
+**Admin setup:** For local testing, register an account and update its role in MongoDB using `mongo-dev`:
+
+```javascript
+db.users.updateOne({ email: "admin@example.com" }, { $set: { role: "admin" } });
+```
+
+Log out and back in to use the updated role.
+
+### 2. Authorization
+
+Protected activity routes use `requireLogin` middleware, while controllers pass `req.user` to services for ownership and role checks. Activity owners and admins can update or delete records; other users receive HTTP 403. Goal creation also requires login and saves the user's ID as `ownerId`.
+
+**How to test:** Create an activity using Account A, then attempt to modify it using Account B. Account B should receive HTTP 403, while the owner or an admin can modify it. Run `npm test` to verify authorization rules using mocked repositories without MongoDB.
+
+User-specific activity listing and goal progress filtering remain future improvements.
+
+### 3. Health Check
+
+Added a public `GET /health` endpoint to check server availability without authentication.
+
+**How to test:** Run `curl -i http://localhost:3000/health` and verify HTTP 200.
+
+### 4. Accessibility Audit
+
+| Area                     | Findings and Verification                                                                                                                                                                |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keyboard navigation      | Tested Activities, Goals, Login, and Signup using Tab, Shift+Tab, Enter, and Space. Verified logical navigation order and visible focus indicators.                                      |
+| HTMX focus               | Fixed focus loss after activity deletion by restoring focus to `#method-filter` in `public/app.js`. Verified through keyboard-only testing.                                              |
+| Forms and errors         | Verified accessible labels (Activities: 5/5; Goals: 3/3), Login and Signup forms, and keyboard-based error correction. Added signup password guidance using `aria-describedby`.          |
+| Focus and contrast       | Improved header focus indicators. Checked text and button contrast, including hover states (approximately 5.5:1–17.9:1), meeting WCAG AA for the tested colors.                          |
+| Responsive accessibility | Tested usability at 200% and 400% browser zoom.                                                                                                                                          |
+| Lighthouse               | Achieved an Accessibility score of **100/100** on the tested page, with 23 passed audits using Lighthouse 13.5.0 (November 22, 2026). Supplemented automated checks with manual testing. |
+
 ## System Diagram
 
-![Sprint 3 System Architecture](docs/sprint3_diagram.svg)
+![Sprint 4 System Architecture](docs/sprint4_diagram.svg)
 
 ## Design Decisions
 
@@ -193,3 +255,7 @@ Restyled `/activities` and `/goals` with Tailwind utility classes for forms, nav
 **Sally Vakhtangishvili:** During Sprint 3, I chose to verify the actual result of MongoDB's deletion operation instead of relying solely on an initial existence check. An alternative would have been to assume deletion succeeded whenever `findById()` located the activity. However, another request could delete the same record between the existence check and the deletion, causing the application to incorrectly report success. By checking whether `removeById()` returns a deleted document, the service can return an accurate 404 response when the record no longer exists. This approach requires an additional conditional check but improves reliability and consistency. I also added Jest regression tests to verify this behavior.
 
 **Agustin Pemberton**: My focus in sprint 3 was designing the web app using Tailwind. I began by minimizing code duplication by extracting element classes into the layer components block into the input file of the src folder. Then, I began making style adjustments such as adding style interactions like hover:, and disabled:. Making visuals adjustments quickly started to seem inefficient, so then began a pursuit for simple tools that could reduce the time between making a change and observing its outcome. I landed on the combination of livereload and nodemon, but there were port-forwarding issues that prevented the tools from working as expected given the dev container environment, so I inspected browser, checked the console to see which port was being used and adjusted the livereload setup accordingly. Ultimately, for this sprint, it was of little benefit given that it doesn't work with css files, but it was a good exercise nonetheless. Now that I think of it, I may be able to get the tailwind equivalent tool to work, which If remember correctly, was just showing me the project files like the browser on the left. For the web app's ui, I decided to keep changes minimal for now, as I anticipate more dramatic ui changes later on, which may accommodate graphs and charts, one of which may display data from a carbon api. The transition and duration addition to buttons is a step towards what should be a pleasing UI that invites the user to consider their own daily contributions to their environment and community. An alternative decision I could have made was to replace the nav links text to icons, with a hover text for each, though I would also have to make that mobile friendly, in which hover isn't typical if possible. The shipped version is better because the smaller screen has the header elements centered, whereas before, the title was slightly left compared to the nav links. Also the ejs files are now easier to navigate, changes to the elements is much more time-efficient, and there is less class soup and duplication. The alternative to those changes would be frustration trying to make simple changes to similar elements that could otherwise be altered all via one layer component block. The alternative had a janky mobile screen that was easier to fix after the classes extraction.
+
+### Sprint 4
+
+**Seoyeon Eom**: I focused on improving accessibility for keyboard-only users. During testing, I found that deleting an activity through HTMX caused keyboard focus to be lost, so I chose to restore focus to the transportation method filter. An alternative was to move focus to the next activity's delete button, but that would require additional handling when no activities remain. I chose the filter because it provides a consistent location, although it may not be the closest element to the deleted activity. I also improved focus indicators in the navigation bar and added password-length guidance to the signup form. These changes were relatively small but helped make the interface more predictable and accessible. I verified them through manual keyboard testing and a Lighthouse accessibility audit.
