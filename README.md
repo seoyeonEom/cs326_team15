@@ -217,9 +217,15 @@ User-specific activity listing and goal progress filtering remain future improve
 
 ### 3. Health Check
 
-Added a public `GET /health` endpoint to check server availability without authentication.
+Added a public `GET /health` endpoint to check server availability without authentication. It is registered before the session middleware, so no login or cookie is required.
 
-**How to test:** Run `curl -i http://localhost:3000/health` and verify HTTP 200.
+**How to test:** With the server running, call it without logging in:
+
+```bash
+curl -i http://localhost:3000/health
+```
+
+**Expected response:** HTTP 200 with `Content-Type: application/json` and `{"status":"ok"}`.
 
 ### 4. Accessibility Audit
 
@@ -259,3 +265,5 @@ Added a public `GET /health` endpoint to check server availability without authe
 ### Sprint 4
 
 **Seoyeon Eom**: I focused on improving accessibility for keyboard-only users. During testing, I found that deleting an activity through HTMX caused keyboard focus to be lost, so I chose to restore focus to the transportation method filter. An alternative was to move focus to the next activity's delete button, but that would require additional handling when no activities remain. I chose the filter because it provides a consistent location, although it may not be the closest element to the deleted activity. I also improved focus indicators in the navigation bar and added password-length guidance to the signup form. These changes were relatively small but helped make the interface more predictable and accessible. I verified them through manual keyboard testing and a Lighthouse accessibility audit.
+
+**Willow Taylor**: /health only reports that the server is up; it doesn't check MongoDB. I could check mongoose.connection.readyState and return 503 when the database is disconnected, but server.js already exits within five seconds at startup if it can't reach MongoDB, so a server that answers at all got a database connection when it started. The task asked for a 200 when the server is up, and a database lookup on every check adds load and a way for the check itself to fail. A brief database reconnect would make /health report the whole app as down. Anything watching it, like a monitor or a container restart policy, would restart a web server that was fine. It also turns a fixed 200 into a status that varies, which every caller has to handle. But, if MongoDB drops after startup, /health still says ok.

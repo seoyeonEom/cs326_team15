@@ -33,12 +33,20 @@ const fetchJSON = async (url, options = {}) => {
 const announceActivitiesChanged = () =>
   document.body.dispatchEvent(new Event("activities-changed"));
 
+const restoreFocus = (element) => {
+  const active = document.activeElement;
+  if (element && (!active || active === document.body)) {
+    element.focus();
+  }
+};
+
 if (form && message) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const activity = Object.fromEntries(new FormData(form));
     const button = form.querySelector('button[type="submit"]');
+    const focused = document.activeElement;
 
     button.disabled = true;
     message.textContent = "";
@@ -57,6 +65,7 @@ if (form && message) {
       message.textContent = `Your activity was not saved. ${error.message}`;
     } finally {
       button.disabled = false;
+      restoreFocus(focused);
     }
   });
 }
@@ -91,6 +100,7 @@ if (goalForm && goalList && message) {
 
     const goal = Object.fromEntries(new FormData(goalForm));
     const button = goalForm.querySelector('button[type="submit"]');
+    const focused = document.activeElement;
 
     button.disabled = true;
     message.textContent = "";
@@ -109,6 +119,7 @@ if (goalForm && goalList && message) {
       message.textContent = `Your goal was not saved. ${error.message}`;
     } finally {
       button.disabled = false;
+      restoreFocus(focused);
     }
   });
 }
