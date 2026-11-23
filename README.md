@@ -221,6 +221,22 @@ Added a public `GET /health` endpoint to check server availability without authe
 
 **How to test:** Run `curl -i http://localhost:3000/health` and verify HTTP 200.
 
+3. Health Check
+
+Added a public GET /health endpoint to check server availability without authentication. It is registered before the session middleware, so it needs no cookie or login.
+
+How to test: With the server running, call it without logging in:
+
+bash
+curl -i http://localhost:3000/health
+
+Expected response:
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{"status":"ok"}
+
 ### 4. Accessibility Audit
 
 | Area                     | Findings and Verification                                                                                                                                                                |

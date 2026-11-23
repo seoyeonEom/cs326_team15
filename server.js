@@ -74,6 +74,10 @@ app.get("/dashboard", (req, res) => {
   res.redirect("/");
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use(cookieParser(SESSION_SECRET));
 app.use(attachUser);
 
