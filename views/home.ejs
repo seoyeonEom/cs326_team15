@@ -1,0 +1,79 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+
+  <body class="activities-body">
+    <%- include('partials/header') %>
+
+    <main class="activities-main">
+
+      <section class="welcome-card" aria-labelledby="welcome-title">
+        <div class="welcome-content">
+          <h1 id="welcome-title" class="welcome-title">
+            Welcome to the Transportation Tracker!
+          </h1>
+
+          <p class="welcome-description">
+            Track your daily activities against real-time carbon data for optimal carbon efficiency. See how you rank in total carbon savings against other students on the leaderboard!
+          </p>
+
+          <div class="welcome-actions">
+            <a href="/activities" class="welcome-button">
+              Log an Activity
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="leaderboard-title">
+        <h2 id="leaderboard-title" class="activities-title">
+          Top 10 Users
+        </h2>
+
+        <div class="leaderboard-card">
+          <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">User</th>
+                  <th scope="col">Score</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% if (leaderboard.length === 0) { %>
+                  <tr>
+                    <td colspan="3" class="leaderboard-empty">
+                      No users on the leaderboard yet.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% leaderboard.forEach(user => { %>
+                    <tr>
+                      <td class="leaderboard-rank">
+                        <%= user.rank %>
+                      </td>
+                      <td class="leaderboard-user">
+                        <%= user.username %>
+                      </td>
+                      <td class="leaderboard-score">
+                        <%= user.score %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -136,4 +136,88 @@
   .breakdown-strong {
     @apply text-slate-900;
   }
+  .leaderboard-card {
+    @apply overflow-hidden rounded-xl border border-slate-200
+           bg-white shadow-sm;
+  }
+
+  .leaderboard-table-wrapper {
+    @apply w-full overflow-x-auto;
+  }
+
+  .leaderboard-table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+
+  .leaderboard-table thead {
+    @apply bg-emerald-50 text-emerald-800;
+  }
+
+  .leaderboard-table th {
+    @apply px-4 py-3 font-semibold
+           border-b border-emerald-100;
+  }
+
+  .leaderboard-table td {
+    @apply px-4 py-3 border-b border-slate-100;
+  }
+
+  .leaderboard-table tbody tr {
+    @apply transition-colors hover:bg-emerald-50/50;
+  }
+
+  .leaderboard-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .leaderboard-rank {
+    @apply w-20 font-bold text-emerald-700;
+  }
+
+  .leaderboard-user {
+    @apply font-medium text-slate-900;
+  }
+
+  .leaderboard-score {
+    @apply text-right font-semibold text-slate-700;
+  }
+
+  .leaderboard-table th:last-child {
+    @apply text-right;
+  }
+
+  .leaderboard-empty {
+    @apply py-8 text-center text-slate-500;
+  }
+
+  .welcome-card {
+    @apply rounded-xl border border-emerald-200
+           bg-gradient-to-r from-emerald-50 to-white
+           p-6 shadow-sm sm:p-8;
+  }
+
+  .welcome-content {
+    @apply flex flex-col gap-4;
+  }
+
+  .welcome-title {
+    @apply text-2xl font-bold tracking-tight
+           text-emerald-800 sm:text-3xl;
+  }
+
+  .welcome-description {
+    @apply max-w-2xl text-sm leading-relaxed
+           text-slate-600 sm:text-base;
+  }
+
+  .welcome-actions {
+    @apply flex flex-wrap gap-3 pt-2;
+  }
+
+  .welcome-button {
+    @apply inline-flex items-center justify-center
+           rounded-lg bg-emerald-700 px-5 py-2.5
+           text-sm font-semibold text-white
+           transition-colors hover:bg-emerald-800;
+  }
 }
