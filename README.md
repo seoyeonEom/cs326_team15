@@ -217,25 +217,15 @@ User-specific activity listing and goal progress filtering remain future improve
 
 ### 3. Health Check
 
-Added a public `GET /health` endpoint to check server availability without authentication.
+Added a public `GET /health` endpoint to check server availability without authentication. It is registered before the session middleware, so no login or cookie is required.
 
-**How to test:** Run `curl -i http://localhost:3000/health` and verify HTTP 200.
+**How to test:** With the server running, call it without logging in:
 
-3. Health Check
-
-Added a public GET /health endpoint to check server availability without authentication. It is registered before the session middleware, so it needs no cookie or login.
-
-How to test: With the server running, call it without logging in:
-
-bash
+```bash
 curl -i http://localhost:3000/health
+```
 
-Expected response:
-
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{"status":"ok"}
+**Expected response:** HTTP 200 with `Content-Type: application/json` and `{"status":"ok"}`.
 
 ### 4. Accessibility Audit
 
