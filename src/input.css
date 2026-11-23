@@ -18,7 +18,7 @@
   }
 
   .header-nav-link {
-    @apply rounded-lg px-3 py-2 text-slate-700 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-800;
+    @apply rounded-lg px-3 py-2 text-slate-700 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700;
   }
 
   .header-div {

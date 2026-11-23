@@ -12,15 +12,23 @@
 
     <main class="mx-auto max-w-md px-4 py-12">
       <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="mb-2 text-2xl font-bold">Create an account</h2>
+        <h1 class="mb-2 text-2xl font-bold">Create an account</h1>
         <p class="mb-6 text-sm text-slate-600">
           Sign up to start tracking your carbon footprint.
         </p>
 
         <% if (error) { %>
-          <p role="alert" class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          <p
+            id="form-error"
+            role="alert"
+            tabindex="-1"
+            class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          >
             <%= error %>
           </p>
+          <script>
+            document.getElementById("form-error").focus();
+          </script>
         <% } %>
 
         <form action="/signup" method="POST" class="space-y-4">
@@ -65,8 +73,12 @@
               autocomplete="new-password"
               required
               minlength="8"
+              aria-describedby="password-help"
               class="form-input w-full"
             >
+            <p id="password-help" class="mt-1 text-sm text-slate-600">
+              Use at least 8 characters.
+            </p>
           </div>
 
           <button type="submit" class="submit-button w-full">

@@ -57,6 +57,7 @@ if (activityForm && message) {
       message.textContent = `Your activity was not saved. ${error.message}`;
     } finally {
       button.disabled = false;
+      restoreFocus(focused);
     }
   });
 }
@@ -91,6 +92,7 @@ if (goalForm && goalList && message) {
 
     const goal = Object.fromEntries(new FormData(goalForm));
     const button = goalForm.querySelector('button[type="submit"]');
+    const focused = document.activeElement;
 
     button.disabled = true;
     message.textContent = "";
@@ -109,6 +111,7 @@ if (goalForm && goalList && message) {
       message.textContent = `Your goal was not saved. ${error.message}`;
     } finally {
       button.disabled = false;
+      restoreFocus(focused);
     }
   });
 }
@@ -138,6 +141,7 @@ if (message) {
       event.detail.requestConfig.verb === "delete"
     ) {
       message.textContent = "Activity deleted.";
+      methodFilter?.focus();
     }
   });
 
