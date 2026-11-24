@@ -33,12 +33,20 @@ const fetchJSON = async (url, options = {}) => {
 const announceActivitiesChanged = () =>
   document.body.dispatchEvent(new Event("activities-changed"));
 
+const restoreFocus = (element) => {
+  const active = document.activeElement;
+  if (element && (!active || active === document.body)) {
+    element.focus();
+  }
+};
+
 if (activityForm && message) {
   activityForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const activity = Object.fromEntries(new FormData(activityForm));
     const button = activityForm.querySelector('button[type="submit"]');
+    const focused = document.activeElement;
 
     button.disabled = true;
     message.textContent = "";

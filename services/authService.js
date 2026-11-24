@@ -46,7 +46,6 @@ export const login = async ({ email, password }) => {
 
 export const getMe = async (id) => {
   const user = await userRepository.findById(id);
-  if (!user)
-    return Err({ status: 401, error: { error: "getMe: not logged in" } });
+  if (!user) return Err({ status: 401, message: "getMe: not logged in" });
   return Ok(toUserDto(user));
 };
