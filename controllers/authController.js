@@ -1,7 +1,5 @@
-import { toUserDto } from "../dtos/userDto.js";
 import * as authService from "../services/authService.js";
 import { createSession, destroySession } from "../sessions.js";
-import * as userRepository from "../repositories/userRepository.js";
 
 const fromForm = (req) => Boolean(req.is("application/x-www-form-urlencoded"));
 
@@ -16,7 +14,12 @@ const startSession = (req, res, userId) => {
 
 export const signupPage = (req, res) => {
   if (req.user) return res.redirect("/activities");
-  res.render("signup", { title: "Sign up", error: null, email: "" });
+  res.render("signup", {
+    title: "Sign up",
+    error: null,
+    email: "",
+    username: "",
+  });
 };
 
 export const loginPage = (req, res) => {
@@ -39,6 +42,7 @@ export const signup = async (req, res) => {
       title: "Sign up",
       error: result.error.message,
       email: req.body.email || "",
+      username: req.body.username || "",
     });
     return;
   }
@@ -86,10 +90,11 @@ export const me = async (req, res) => {
     return;
   }
 
-  const user = await userRepository.findById(req.user.id);
-  if (!user) {
-    res.status(401).json({ error: "not logged in" });
+  const result = await authService.getMe(req.user.id);
+
+  if (!result.ok) {
+    res.status(result.error.status).json({ error: result.error.message });
     return;
   }
-  res.status(200).json(toUserDto(user));
+  res.status(200).json(result.value);
 };

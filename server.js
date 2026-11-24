@@ -6,6 +6,7 @@ import activityRecordsRouter from "./routes/activityRecords.js";
 import cookieParser from "cookie-parser";
 import { attachUser } from "./middleware/attachUser.js";
 import authRouter from "./routes/auth.js";
+import homeRouter from "./routes/home.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -64,12 +65,7 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Home Page
-app.get("/", (req, res) => {
-  res.render("home", { title: "Home" });
-});
-
-// Redirect Dashboard to Home
+// Domain-Specific Page
 app.get("/dashboard", (req, res) => {
   res.redirect("/");
 });
@@ -82,6 +78,7 @@ app.use(cookieParser(SESSION_SECRET));
 app.use(attachUser);
 
 app.use(authRouter);
+app.use("/", homeRouter);
 app.use("/activities", activitiesRouter);
 app.use("/activities", activityRecordsRouter);
 app.use("/goals", goalsRouter);
